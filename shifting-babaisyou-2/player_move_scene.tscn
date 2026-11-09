@@ -2,27 +2,33 @@
 
 [ext_resource type="Script" uid="uid://grsm16dyqtpg" path="res://player.gd" id="1_pnmjv"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_nslow"]
-size = Vector2(64, 64)
-
 [sub_resource type="Gradient" id="Gradient_srx0k"]
 offsets = PackedFloat32Array(1)
 colors = PackedColorArray(1, 1, 1, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_nslow"]
 gradient = SubResource("Gradient_srx0k")
+width = 32
+height = 32
 
 [node name="Node2D" type="Node2D" unique_id=532175261]
 
-[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1678928662]
+[node name="Floor" type="TileMapLayer" parent="." unique_id=1678928662]
 
-[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1527255110]
+[node name="Modifiers" type="TileMapLayer" parent="." unique_id=1193489730]
+
+[node name="Hazards" type="TileMapLayer" parent="." unique_id=1903783359]
+
+[node name="Walls" type="TileMapLayer" parent="." unique_id=487960047]
+
+[node name="Boxes" type="TileMapLayer" parent="." unique_id=1862602757]
+
+[node name="CharacterBody2D" type="Node2D" parent="." unique_id=1727701370 node_paths=PackedStringArray("walls_layer", "boxes_layer", "modifiers_layer")]
 script = ExtResource("1_pnmjv")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=7844911]
-shape = SubResource("RectangleShape2D_nslow")
+tile_size = 32
+walls_layer = NodePath("../Walls")
+boxes_layer = NodePath("../Boxes")
+modifiers_layer = NodePath("../Modifiers")
 
 [node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=1442057269]
 texture = SubResource("GradientTexture2D_nslow")
-
-[node name="RayCast2D" type="RayCast2D" parent="CharacterBody2D" unique_id=1671436400]
