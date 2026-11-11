@@ -38,17 +38,33 @@ func grid_to_world(grid: Vector2i) -> Vector2:
 func is_wall(cell: Vector2i) -> bool:
 	return level.is_wall(cell)
 
-func try_move(dir: Vector2i) -> bool:
+func can_move(dir: Vector2i) -> bool:
 	if moving or dir == Vector2i.ZERO:
 		return false
 
 	var target := grid_pos + dir
-
 	if is_wall(target):
 		return false
 
-	if not await can_move_to(target, dir):
+	return can_move_to(target, dir)
+
+func can_move_to(target: Vector2i, dir: Vector2i) -> bool:
+	var box = level.get_box_at(target)
+	if box:
+		# Recursively check if the next box in the chain can move
+		if box.can_move(dir):
+			# Trigger the box's movement without awaiting so the whole chain slides together
+			box.try_move(dir)
+			return true
 		return false
+	return true
+
+func try_move(dir: Vector2i) -> bool:
+	if not can_move(dir):
+		return false
+
+	var target := grid_pos + dir
+	moving = true
 
 	# Update registry if this is a box
 	if is_in_group("boxes"):
@@ -59,19 +75,13 @@ func try_move(dir: Vector2i) -> bool:
 	if is_in_group("boxes"):
 		level.register_box(self)
 
-	moving = true
-
 	var tween := create_tween()
-	tween.tween_property(self, "global_position", grid_to_world(grid_pos), 1.0 / move_speed)\
-		.set_trans(Tween.TRANS_SINE)
+	tween.tween_property(self, "global_position", grid_to_world(grid_pos), 1.0 / move_speed).set_trans(Tween.TRANS_SINE)
 
 	await tween.finished
 	moving = false
 
 	_on_move_finished()
-	return true
-
-func can_move_to(_target: Vector2i, _dir: Vector2i) -> bool:
 	return true
 
 func _on_move_finished() -> void:

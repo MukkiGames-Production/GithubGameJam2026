@@ -40,6 +40,8 @@ func try_move() -> void:
 	ray.target_position = desired_dir * tile_size
 	ray.force_raycast_update()
 
+func _on_move_finished() -> void:
+	level.check_win()
 	if ray.is_colliding():
 		_bump(ray.get_collider())
 		return
