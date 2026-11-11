@@ -5,7 +5,7 @@ extends SceneTree
 ## Run with:
 ##   godot --headless --path . -s res://tests/test_matrix_board.gd
 
-const Puzzle := preload("res://shift_puzzle.gd")
+const Puzzle := preload("res://MatrixPuzzle/shift_puzzle.gd")
 
 var checks := 0
 var failures := 0
@@ -50,7 +50,7 @@ func _line_has_piece(state: String, is_row: bool, idx: int) -> bool:
 
 
 func _run() -> void:
-	var packed: PackedScene = load("res://Matrix_Puzzle.tscn")
+	var packed: PackedScene = load("res://MatrixPuzzle/Matrix_Puzzle.tscn")
 	_check(packed != null, "scene loads")
 	if packed == null:
 		return
@@ -138,7 +138,7 @@ func _run() -> void:
 	_check(_line_has_piece(board.state, is_row, line_idx), "crank line holds a piece")
 
 	var before_push: String = board.state
-	body.desired_dir = Vector2.DOWN  # the push direction must not matter
+	body.desired_dir = Vector2i.DOWN  # the push direction must not matter
 	body._bump(piece.get_node("Body/CollisionShape2D"))
 	await create_timer(0.8).timeout
 	var expected: String = before_push
