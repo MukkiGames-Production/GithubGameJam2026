@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://chvm60s11q1j"]
+
+[ext_resource type="Script" uid="uid://cpg2gj1mr8tar" path="res://gate.gd" id="1_15vrf"]
+
+[node name="gate" type="Node2D" unique_id=1396264574]
+script = ExtResource("1_15vrf")
+
+[node name="gate_physical" type="Node2D" parent="." unique_id=1114279798]
