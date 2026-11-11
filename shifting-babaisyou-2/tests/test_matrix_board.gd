@@ -41,6 +41,14 @@ func _count_floor(node: Node) -> int:
 	return count
 
 
+func _line_has_piece(state: String, is_row: bool, idx: int) -> bool:
+	for i in 4:
+		var cell := Vector2i(i, idx) if is_row else Vector2i(idx, i)
+		if state[cell.y * 4 + cell.x] != ".":
+			return true
+	return false
+
+
 func _run() -> void:
 	var packed: PackedScene = load("res://Matrix_Puzzle.tscn")
 	_check(packed != null, "scene loads")
@@ -61,6 +69,19 @@ func _run() -> void:
 	_check(_count_floor(scene.get_node("Matrix")) == 16, "exactly the 16 scene floor tiles")
 	_check(board.moves_made == 0, "new game starts at 0 moves")
 
+	# Player integration: one board cell equals one player step.
+	var player := scene.get_node_or_null("Player")
+	_check(player != null, "player scene is instanced")
+	if player == null:
+		return
+	var body := player.get_node_or_null("CharacterBody2D")
+	_check(body != null, "player has its CharacterBody2D")
+	if body == null:
+		return
+	_check(body.position == Vector2(32, 32), "player snapped onto the 64 px grid")
+	_check(board.cell_size == 64.0, "board cells match the player grid")
+	_check(scene.get_node_or_null("Matrix/BoardCollision") != null, "board has a collision body")
+
 	# Move a row that actually holds a piece, then undo it.
 	var row_with_piece := 0
 	for i in board.state.length():
@@ -75,9 +96,52 @@ func _run() -> void:
 	_check(board.state == before, "undo restores the state")
 	_check(board.moves_made == 0, "undo clears the move count")
 
-	# One step away from solved: the Solve button must finish it.
-	board.state = Puzzle.shift_row(board.GOAL_STATE, 0, 1)
-	board._rebuild()
+	# Shifting is done through the arrow pieces, in their own direction.
+	_check(not board.has_method("push_from_player"), "board ignores direct bumps")
+	var piece = null
+	for node_name in ["ShiftRightPiece", "ShiftRightPiece2", "ShiftLeftPiece", "ShiftLeftPiece2"]:
+		piece = scene.get_node_or_null(node_name)
+		if piece != null:
+			break
+	_check(piece != null and piece.has_method("push_from_player"), "shift pieces are interactive")
+	if piece == null:
+		return
+	_check(piece.global_position == board.to_global(board.cell_center(piece.cell)), "shift piece snapped onto the board grid")
+
+	# Work out the line the piece cranks, the same way MatrixPuzzle does.
+	var dir: Vector2i = piece.direction
+	var is_row: bool = dir.x != 0
+	var line_idx: int
+	if is_row:
+		line_idx = piece.cell.y if piece.cell.y >= 0 and piece.cell.y < 4 else piece.cell.x
+	else:
+		line_idx = piece.cell.x if piece.cell.x >= 0 and piece.cell.x < 4 else piece.cell.y
+	line_idx = clampi(line_idx, 0, 3)
+
+	# The scene layout is free-form: make sure the crank's line has a piece.
+	if not _line_has_piece(board.state, is_row, line_idx):
+		for i in 4:
+			var cell := Vector2i(i, line_idx) if is_row else Vector2i(line_idx, i)
+			if board.state[cell.y * 4 + cell.x] == ".":
+				board.tiles[0].position = board.cell_center(cell)
+				break
+		board.state = board._state_from_tiles()
+	_check(_line_has_piece(board.state, is_row, line_idx), "crank line holds a piece")
+
+	var before_push: String = board.state
+	body.desired_dir = Vector2.DOWN  # the push direction must not matter
+	body._bump(piece.get_node("Body/CollisionShape2D"))
+	await create_timer(0.8).timeout
+	var expected: String = before_push
+	if is_row:
+		expected = Puzzle.shift_row(expected, line_idx, -int(signf(dir.x)))
+	else:
+		expected = Puzzle.shift_col(expected, line_idx, int(signf(dir.y)))
+	_check(board.state == expected, "shift piece shifts its line in its own direction")
+
+	# The Solve path runs the solver and lands the board solved.
+	board.state = "1....O.........."
+	_check(not Puzzle.is_solved(board.state, board.goal_word), "test layout is unsolved")
 	await board.play_solution()
 	_check(Puzzle.is_solved(board.state, board.goal_word), "solve finishes the board")
 

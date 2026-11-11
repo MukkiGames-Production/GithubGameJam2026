@@ -1,9 +1,10 @@
 class_name MatrixPuzzle
 extends Node2D
-## 2D matrix puzzle board drawn from gamejam2026spritesheet.png.
+## 2D matrix puzzle board.
 ##
 ## Rules live in shift_puzzle.gd (no nodes); this node only renders, animates
-## and handles input. Drag a row or column to shift it, or use the HUD.
+## and handles input. Pieces only move when a shift piece is bumped: the board
+## itself is just a wall and has no direct input.
 
 signal moved(moves: int)
 signal solved(moves: int)
@@ -12,43 +13,23 @@ const Puzzle := preload("res://shift_puzzle.gd")
 
 const N := 4                        # must match ShiftPuzzle.N
 const SHEET_CELL := 8.0             # sprite sheet frame size in pixels
-const TILE_SCALE := 4.0             # 8 px art drawn at 32 px
-const BOARD_ORIGIN := Vector2(190, 177)
+const TILE_SCALE := 8.0             # 8 px art drawn at 64 px (one player cell)
+const BOARD_ORIGIN := Vector2(192, 192)
 
-# Atlas frames as (column, row) cells of the 8x8 sprite sheet.
-const FRAME_ONE := Vector2i(0, 0)
-const FRAME_ZERO := Vector2i(1, 0)
-const FRAME_FLOOR := Vector2i(0, 3)
-const FRAME_HOLE := Vector2i(1, 3)
-
-# Puzzle symbol -> atlas frame. "." (empty) has no frame and is skipped.
-const TILE_FRAMES := {
-	"1": FRAME_ONE,
-	"O": FRAME_ZERO,
-}
-
-# A solved layout for the sheet's pieces: "1O" adjacent on the top row.
-const GOAL_STATE := "1O......O....1.."
-
-@export var sprite_sheet: Texture2D = preload("res://gamejam2026spritesheet.png")
 @export var goal_word := "1O"
 @export var cell_size := SHEET_CELL * TILE_SCALE
 @export var board_origin := BOARD_ORIGIN
-@export var scramble_moves := 5
 @export var solve_depth := 6
 
-var state: String = GOAL_STATE
+var state := ""
 var busy := false
 var moves_made := 0
 var history: Array = []
 
-var tiles: Array[Sprite2D] = []
+var tiles: Array[Sprite2D] = []    # the piece sprites authored in the scene
 
-var _pool: Array[Sprite2D] = []  # scene-provided pieces not currently on the board
+var _start_cells: Dictionary = {}  # tile -> cell it was authored on
 
-var _dragging := false
-var _drag_start := Vector2.ZERO
-var _drag_cell := Vector2i.ZERO
 var _hud: CanvasLayer
 var _moves_label: Label
 var _status_label: Label
@@ -56,34 +37,36 @@ var _status_label: Label
 
 func _ready() -> void:
 	assert(N == Puzzle.N, "MatrixPuzzle.N must match ShiftPuzzle.N")
-	clip_children = CanvasItem.CLIP_CHILDREN_ONLY
+	clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
 	_adopt_scene_sprites()
 	_build_hud()
 	new_game()
 
 
-## Uses the floor/piece sprites placed in the scene when they are there, so the
-## board is laid out as real assets instead of being generated at runtime.
+## Collects the sprite assets authored in the scene. Floors get aligned to the
+## grid; pieces inside the board become the playable tiles.
 func _adopt_scene_sprites() -> void:
-	var has_scene_floor := false
+	tiles.clear()
+	_start_cells.clear()
 	for child in get_children():
 		if not child is Sprite2D:
 			continue
 		var sprite := child as Sprite2D
-		sprite.scale = Vector2.ONE * (cell_size / SHEET_CELL)
-		if sprite.has_meta("symbol"):
-			sprite.visible = false
-			_pool.append(sprite)
-		elif sprite.has_meta("floor"):
-			sprite.position = _cell_center(sprite.get_meta("cell"))
-			has_scene_floor = true
-	if not has_scene_floor:
-		_build_floor()
+		if sprite.has_meta("floor"):
+			sprite.scale = Vector2.ONE * (cell_size / SHEET_CELL)
+			sprite.position = cell_center(sprite.get_meta("cell"))
+		elif sprite.has_meta("symbol"):
+			var cell := _cell_of(sprite)
+			if cell.x < 0 or cell.x >= N or cell.y < 0 or cell.y >= N:
+				continue  # spares or decorations outside the board are left alone
+			sprite.scale = Vector2.ONE * (cell_size / SHEET_CELL)
+			tiles.append(sprite)
+			_start_cells[sprite] = cell
 
 
 func _draw() -> void:
-	# Drawing gives this node a rect; clip_children clips the sliding tiles
-	# (and their wrap-around ghosts) to the board.
+	# The drawn rect doubles as the alpha mask clip_children uses: tiles sliding
+	# out of the board (and the ghosts entering it) are clipped to the board.
 	draw_rect(_board_rect(), Color("0c112b"))
 
 
@@ -93,77 +76,43 @@ func _board_rect() -> Rect2:
 	return Rect2(board_origin, Vector2.ONE * cell_size * N)
 
 
-func _cell_center(cell: Vector2i) -> Vector2:
+func cell_center(cell: Vector2i) -> Vector2:
 	return board_origin + (Vector2(cell) + Vector2(0.5, 0.5)) * cell_size
+
+
+## Board-space cell for a local position; cells outside the board are valid.
+func cell_at(local_position: Vector2) -> Vector2i:
+	var rel := local_position - board_origin
+	return Vector2i(floori(rel.x / cell_size), floori(rel.y / cell_size))
 
 
 func _cell_of(tile: Node2D) -> Vector2i:
 	return Vector2i(((tile.position - board_origin) / cell_size).floor())
 
 
-func _make_sprite(frame: Vector2i) -> Sprite2D:
-	var atlas := AtlasTexture.new()
-	atlas.atlas = sprite_sheet
-	atlas.region = Rect2(Vector2(frame) * SHEET_CELL, Vector2.ONE * SHEET_CELL)
-	var sprite := Sprite2D.new()
-	sprite.texture = atlas
-	sprite.scale = Vector2.ONE * (cell_size / SHEET_CELL)
-	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	return sprite
-
-
-func _build_floor() -> void:
-	for i in N * N:
-		var floor_tile := _make_sprite(FRAME_FLOOR)
-		floor_tile.position = _cell_center(Vector2i(i % N, i / N))
-		floor_tile.modulate = Color(0.6, 0.65, 0.6)
-		add_child(floor_tile)
-
-
-func _rebuild() -> void:
-	for tile in tiles:
-		tile.visible = false
-		_pool.append(tile)
-	tiles.clear()
-	for i in N * N:
-		var ch := state[i]
-		if not TILE_FRAMES.has(ch):
-			continue
-		var tile := _take_piece(ch)
-		tile.visible = true
-		tile.position = _cell_center(Vector2i(i % N, i / N))
-		tiles.append(tile)
-
-
-func _take_piece(ch: String) -> Sprite2D:
-	for i in _pool.size():
-		if _pool[i].get_meta("symbol", "") == ch:
-			return _pool.pop_at(i)
-	# The scene only had spares for other pieces: build one from the atlas.
-	var tile := _make_sprite(TILE_FRAMES[ch])
-	tile.set_meta("symbol", ch)
-	add_child(tile)
-	return tile
-
-
 # --- game flow -------------------------------------------------------------
 
+## Puts the pieces back where they were authored in the scene.
 func new_game() -> void:
 	if busy:
 		return
 	moves_made = 0
 	history.clear()
-	state = GOAL_STATE
-	var guard := 100
-	while Puzzle.is_solved(state, goal_word) and guard > 0:
-		guard -= 1
-		state = GOAL_STATE
-		for _i in scramble_moves:
-			var k := randi_range(1, N - 1)
-			var idx := randi() % N
-			state = Puzzle.shift_row(state, idx, k) if randf() < 0.5 else Puzzle.shift_col(state, idx, k)
-	_rebuild()
+	for tile in tiles:
+		tile.position = cell_center(_start_cells[tile])
+	state = _state_from_tiles()
 	moved.emit(moves_made)
+
+
+## Rebuilds the logical state from where the piece sprites currently are.
+func _state_from_tiles() -> String:
+	var cells := PackedStringArray()
+	cells.resize(N * N)
+	cells.fill(".")
+	for tile in tiles:
+		var cell := _cell_of(tile)
+		cells[cell.y * N + cell.x] = String(tile.get_meta("symbol", ""))
+	return "".join(cells)
 
 
 func undo() -> void:
@@ -220,6 +169,21 @@ func _do_move(kind: String, idx: int, n: int) -> void:
 		_win_flash()
 
 
+## Shifts the board line aligned with cell in the given direction. Called by
+## shift pieces; a horizontal direction shifts a row, a vertical one a column.
+func shift_line(cell: Vector2i, push: Vector2) -> void:
+	if busy or push == Vector2.ZERO:
+		return
+	if absf(push.x) > absf(push.y):
+		# Above/below the board the piece's column picks the row it controls.
+		var row := cell.y if cell.y >= 0 and cell.y < N else cell.x
+		_do_move("row", clampi(row, 0, N - 1), -int(signf(push.x)))
+	else:
+		# Beside the board the piece's row picks the column it controls.
+		var col := cell.x if cell.x >= 0 and cell.x < N else cell.y
+		_do_move("col", clampi(col, 0, N - 1), int(signf(push.y)))
+
+
 func _line_has_piece(kind: String, idx: int) -> bool:
 	for i in N:
 		var ch := state[i * N + idx] if kind == "col" else state[idx * N + i]
@@ -240,7 +204,6 @@ func _apply_move(kind: String, idx: int, n: int) -> void:
 		anim_n -= N  # take the short way around
 	await _animate(kind, idx, anim_n)
 	state = Puzzle.apply_move(state, [kind, idx, n])
-	_rebuild()
 
 
 # --- animation -------------------------------------------------------------
@@ -249,6 +212,7 @@ func _animate(kind: String, idx: int, n: int) -> void:
 	var horizontal := kind == "row"
 	var tween: Tween = null
 	var ghosts: Array[Sprite2D] = []
+	var landings: Array = []  # [tile, cell it ends on after wrapping]
 	for tile in tiles:
 		var cell := _cell_of(tile)
 		if (horizontal and cell.y != idx) or (not horizontal and cell.x != idx):
@@ -258,9 +222,10 @@ func _animate(kind: String, idx: int, n: int) -> void:
 			tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 		var along: int = cell.x if horizontal else cell.y
 		var dest := along - n if horizontal else along + n
-		var target := _cell_center(Vector2i(dest, cell.y) if horizontal else Vector2i(cell.x, dest))
+		var target := cell_center(Vector2i(dest, cell.y) if horizontal else Vector2i(cell.x, dest))
 		var axis := "position:x" if horizontal else "position:y"
 		tween.tween_property(tile, axis, target.x if horizontal else target.y, 0.35)
+		landings.append([tile, Vector2i(posmod(dest, N), cell.y) if horizontal else Vector2i(cell.x, posmod(dest, N))])
 
 		if dest < 0 or dest >= N:
 			# The tile leaves one edge: a ghost enters from the opposite one.
@@ -270,12 +235,14 @@ func _animate(kind: String, idx: int, n: int) -> void:
 			ghosts.append(ghost)
 			var start_cell := Vector2i(along + offset, cell.y) if horizontal else Vector2i(cell.x, along + offset)
 			var end_cell := Vector2i(dest + offset, cell.y) if horizontal else Vector2i(cell.x, dest + offset)
-			ghost.position = _cell_center(start_cell)
-			var ghost_target := _cell_center(end_cell)
+			ghost.position = cell_center(start_cell)
+			var ghost_target := cell_center(end_cell)
 			tween.tween_property(ghost, axis, ghost_target.x if horizontal else ghost_target.y, 0.35)
 
 	if tween != null:
 		await tween.finished
+	for entry in landings:
+		(entry[0] as Sprite2D).position = cell_center(entry[1])
 	for ghost in ghosts:
 		ghost.queue_free()
 
@@ -298,53 +265,6 @@ func _flash_line(move: Array) -> void:
 		tween.tween_property(tile, "self_modulate", Color.WHITE, 0.15)
 
 
-# --- input -----------------------------------------------------------------
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey:
-		var key := event as InputEventKey
-		if key.pressed and not key.echo:
-			match key.keycode:
-				KEY_R:
-					new_game()
-				KEY_U:
-					undo()
-				KEY_H:
-					hint()
-				KEY_S:
-					play_solution()
-		return
-
-	if not event is InputEventMouseButton or busy:
-		return
-	var mouse := event as InputEventMouseButton
-	if mouse.button_index != MOUSE_BUTTON_LEFT:
-		return
-
-	var local := to_local(get_global_mouse_position())
-	if mouse.pressed:
-		if _board_rect().has_point(local):
-			_dragging = true
-			_drag_start = local
-			_drag_cell = Vector2i(((local - board_origin) / cell_size).floor())
-	else:
-		_finish_drag(local)
-
-
-func _finish_drag(local: Vector2) -> void:
-	if not _dragging:
-		return
-	_dragging = false
-	var delta := local - _drag_start
-	if delta.length() < cell_size * 0.4:
-		return
-	if absf(delta.x) > absf(delta.y):
-		# Drag right shifts right, which is a negative left shift.
-		_do_move("row", _drag_cell.y, -clampi(roundi(delta.x / cell_size), 1, N / 2))
-	else:
-		_do_move("col", _drag_cell.x, clampi(roundi(delta.y / cell_size), 1, N / 2))
-
-
 # --- HUD -------------------------------------------------------------------
 
 func _build_hud() -> void:
@@ -362,10 +282,10 @@ func _build_hud() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	box.add_child(row)
-	row.add_child(_button("New Game (R)", new_game))
-	row.add_child(_button("Undo (U)", undo))
-	row.add_child(_button("Hint (H)", hint))
-	row.add_child(_button("Solve (S)", play_solution))
+	row.add_child(_button("New Game", new_game))
+	row.add_child(_button("Undo", undo))
+	row.add_child(_button("Hint", hint))
+	row.add_child(_button("Solve", play_solution))
 
 	_moves_label = Label.new()
 	box.add_child(_moves_label)
@@ -375,7 +295,7 @@ func _build_hud() -> void:
 	box.add_child(_status_label)
 
 	var help := Label.new()
-	help.text = "Drag a row or column to shift it."
+	help.text = "Walk into an arrow piece to shift its line."
 	help.add_theme_font_size_override("font_size", 12)
 	help.modulate = Color(1, 1, 1, 0.6)
 	box.add_child(help)

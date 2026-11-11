@@ -39,3 +39,29 @@ func can_move_to(target: Vector2i, dir: Vector2i) -> bool:
 
 func _on_move_finished() -> void:
 	level.check_win()
+	if ray.is_colliding():
+		_bump(ray.get_collider())
+		return
+
+	moving = true
+	var target := position + desired_dir * tile_size
+
+	var tween := create_tween()
+	tween.tween_property(self, "position", target, 1.0 / move_speed)\
+		.set_trans(Tween.TRANS_SINE)
+	await tween.finished
+	moving = false
+
+	# Immediately try the next move if the player is still holding a direction
+	try_move()
+
+
+## Lets whatever we walked into react, e.g. the shift board shifting the row or
+## column we are pushing against.
+func _bump(collider: Object) -> void:
+	var node := collider as Node
+	while node != null:
+		if node.has_method("push_from_player"):
+			node.push_from_player(desired_dir, global_position)
+			return
+		node = node.get_parent()
