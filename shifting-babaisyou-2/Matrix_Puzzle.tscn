@@ -567,22 +567,22 @@ region = Rect2(0, 0, 8, 8)
 atlas = ExtResource("3_slbmu")
 region = Rect2(8, 0, 8, 8)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_144fo"]
-atlas = ExtResource("3_slbmu")
-region = Rect2(0, 8, 8, 8)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_7uwkc"]
-atlas = SubResource("AtlasTexture_144fo")
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_shift"]
-size = Vector2(7.5, 8.5625)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_gltr7"]
 atlas = ExtResource("3_slbmu")
 region = Rect2(16, 8, 8, 8)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_r750h"]
 atlas = SubResource("AtlasTexture_gltr7")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shift"]
+size = Vector2(7.5, 8.5625)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_144fo"]
+atlas = ExtResource("3_slbmu")
+region = Rect2(0, 8, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7uwkc"]
+atlas = SubResource("AtlasTexture_144fo")
 
 [node name="Node2D" type="Node2D" unique_id=954893667]
 
@@ -592,7 +592,7 @@ tile_map_data = PackedByteArray("AAADAAMAAQAFAAUAAAADAAQAAQAFAAQAAAAEAAMAAQAEAAU
 tile_set = SubResource("TileSet_3togr")
 
 [node name="Matrix" type="Node2D" parent="." unique_id=1740770337]
-position = Vector2(-5, 82)
+position = Vector2(45, 234)
 script = ExtResource("4_mpz1")
 
 [node name="BoardCollision" type="StaticBody2D" parent="Matrix" unique_id=920000001]
@@ -787,35 +787,37 @@ scale = Vector2(8, 8)
 texture = SubResource("AtlasTexture_one")
 metadata/symbol = "1"
 
-[node name="ShiftRightPiece" type="Sprite2D" parent="." unique_id=398294785 groups=["shiftPiece"]]
+[node name="ShiftUpPiece" type="Sprite2D" parent="." unique_id=398294785 groups=["shiftPiece"]]
 texture_filter = 1
-position = Vector2(203, 34)
-scale = Vector2(8, 8)
-texture = SubResource("AtlasTexture_7uwkc")
-script = ExtResource("6_shft")
-
-[node name="Body" type="StaticBody2D" parent="ShiftRightPiece" unique_id=940000001]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftRightPiece/Body" unique_id=940000002]
-position = Vector2(-0.125, 0)
-shape = SubResource("RectangleShape2D_shift")
-
-[node name="ShiftRightPiece2" type="Sprite2D" parent="." unique_id=1971598117 groups=["shiftPiece"]]
-texture_filter = 1
-position = Vector2(267, 34)
+position = Vector2(288, 96)
+rotation = -1.5707964
 scale = Vector2(8, 8)
 texture = SubResource("AtlasTexture_r750h")
 script = ExtResource("6_shft")
+direction = Vector2i(0, -1)
 
-[node name="Body" type="StaticBody2D" parent="ShiftRightPiece2" unique_id=940000011]
+[node name="Body" type="StaticBody2D" parent="ShiftUpPiece" unique_id=940000001]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftRightPiece2/Body" unique_id=940000012]
-position = Vector2(-0.25, 0)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftUpPiece/Body" unique_id=940000002]
+shape = SubResource("RectangleShape2D_shift")
+
+[node name="ShiftDownPiece" type="Sprite2D" parent="." unique_id=1971598117 groups=["shiftPiece"]]
+texture_filter = 1
+position = Vector2(413, 91)
+rotation = 1.5707964
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_r750h")
+script = ExtResource("6_shft")
+direction = Vector2i(0, 1)
+
+[node name="Body" type="StaticBody2D" parent="ShiftDownPiece" unique_id=940000011]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftDownPiece/Body" unique_id=940000012]
 shape = SubResource("RectangleShape2D_shift")
 
 [node name="ShiftLeftPiece" type="Sprite2D" parent="." unique_id=1589248969 groups=["shiftPiece"]]
 texture_filter = 1
-position = Vector2(331, 34)
+position = Vector2(96, 288)
 scale = Vector2(8, 8)
 texture = SubResource("AtlasTexture_r750h")
 script = ExtResource("6_shft")
@@ -824,21 +826,19 @@ direction = Vector2i(-1, 0)
 [node name="Body" type="StaticBody2D" parent="ShiftLeftPiece" unique_id=940000021]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftLeftPiece/Body" unique_id=940000022]
-position = Vector2(-0.375, 0)
 shape = SubResource("RectangleShape2D_shift")
 
-[node name="ShiftLeftPiece2" type="Sprite2D" parent="." unique_id=623426855 groups=["shiftPiece"]]
+[node name="ShiftRightPiece" type="Sprite2D" parent="." unique_id=623426855 groups=["shiftPiece"]]
 texture_filter = 1
-position = Vector2(395, 34)
+position = Vector2(537.00006, 289.00003)
+rotation = 0.0436692
 scale = Vector2(8, 8)
-texture = SubResource("AtlasTexture_r750h")
+texture = SubResource("AtlasTexture_7uwkc")
 script = ExtResource("6_shft")
-direction = Vector2i(-1, 0)
 
-[node name="Body" type="StaticBody2D" parent="ShiftLeftPiece2" unique_id=940000031]
+[node name="Body" type="StaticBody2D" parent="ShiftRightPiece" unique_id=940000031]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftLeftPiece2/Body" unique_id=940000032]
-position = Vector2(-0.5, -0.125)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftRightPiece/Body" unique_id=940000032]
 shape = SubResource("RectangleShape2D_shift")
 
 [node name="Player" parent="." unique_id=1575326642 instance=ExtResource("6_r750h")]

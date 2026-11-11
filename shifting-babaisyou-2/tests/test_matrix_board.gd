@@ -65,7 +65,12 @@ func _run() -> void:
 		return
 
 	_check(board.tiles.size() == _pieces(board.state), "one sprite per piece")
-	_check(board.tiles[0].name.begins_with("Piece_"), "board reuses the pieces placed in the scene")
+	_check(board.tiles[0].name.ends_with("_tile"), "board spawns a copy of each scene piece")
+	var templates_hidden := true
+	for child in scene.get_node("Matrix").get_children():
+		if child is Sprite2D and child.is_in_group("PuzzlePiece") and child.visible:
+			templates_hidden = false
+	_check(templates_hidden, "piece templates are hidden after spawning")
 	_check(_count_floor(scene.get_node("Matrix")) == 16, "exactly the 16 scene floor tiles")
 	_check(board.moves_made == 0, "new game starts at 0 moves")
 
@@ -80,7 +85,9 @@ func _run() -> void:
 	_check(body != null, "player node resolved")
 	if body == null:
 		return
-	_check(body.position == Vector2(32, 32), "player snapped onto the 64 px grid")
+	var grid_offset: Vector2 = body.position - Vector2(32, 32)
+	var on_grid := is_zero_approx(fmod(grid_offset.x, 64.0)) and is_zero_approx(fmod(grid_offset.y, 64.0))
+	_check(on_grid, "player snapped onto the 64 px grid")
 	_check(board.cell_size == 64.0, "board cells match the player grid")
 	_check(scene.get_node_or_null("Matrix/BoardCollision") != null, "board has a collision body")
 
@@ -101,7 +108,7 @@ func _run() -> void:
 	# Shifting is done through the arrow pieces, in their own direction.
 	_check(not board.has_method("push_from_player"), "board ignores direct bumps")
 	var piece = null
-	for node_name in ["ShiftRightPiece", "ShiftRightPiece2", "ShiftLeftPiece", "ShiftLeftPiece2"]:
+	for node_name in ["ShiftUpPiece", "ShiftDownPiece", "ShiftLeftPiece", "ShiftRightPiece"]:
 		piece = scene.get_node_or_null(node_name)
 		if piece != null:
 			break
