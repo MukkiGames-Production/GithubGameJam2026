@@ -1,7 +1,7 @@
 extends Node2D
 class_name MovingEntity
 
-@export var tile_size: int = 64
+@export var tile_size: int = 8
 @export var move_speed: float = 8.0
 
 var grid_pos: Vector2i
@@ -47,7 +47,7 @@ func try_move(dir: Vector2i) -> bool:
 	if is_wall(target):
 		return false
 
-	if not can_move_to(target, dir):
+	if not await can_move_to(target, dir):
 		return false
 
 	# Update registry if this is a box

@@ -30,25 +30,30 @@ goals_layer = NodePath("Hazards")
 
 [node name="CharacterBody2D" type="Node2D" parent="Level" unique_id=1727701370]
 script = ExtResource("1_pnmjv")
-tile_size = 32
 
 [node name="Sprite2D" type="Sprite2D" parent="Level/CharacterBody2D" unique_id=1442057269]
 texture = SubResource("GradientTexture2D_nslow")
 
 [node name="Floor" type="TileMapLayer" parent="Level" unique_id=1678928662]
+scale = Vector2(2, 2)
 tile_set = SubResource("TileSet_fvauv")
 
 [node name="Walls" type="TileMapLayer" parent="Level" unique_id=487960047]
+scale = Vector2(2, 2)
 tile_set = SubResource("TileSet_t44kd")
 
 [node name="Modifiers" type="TileMapLayer" parent="Level" unique_id=1193489730]
+scale = Vector2(2, 2)
 tile_set = SubResource("TileSet_rfxws")
 
 [node name="Hazards" type="TileMapLayer" parent="Level" unique_id=1903783359]
+scale = Vector2(2, 2)
 tile_set = SubResource("TileSet_hfws3")
 
 [node name="Boxes" type="Node2D" parent="Level" unique_id=2003082193]
 
 [node name="Box1" parent="Level/Boxes" unique_id=348941812 instance=ExtResource("2_fvauv")]
+position = Vector2(510, 171)
 
 [node name="Box2" parent="Level/Boxes" unique_id=1863902041 instance=ExtResource("2_fvauv")]
+position = Vector2(426, 148)
