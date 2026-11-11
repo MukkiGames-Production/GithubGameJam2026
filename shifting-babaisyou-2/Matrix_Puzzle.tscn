@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cfmg4aetsgomh" path="res://tileset_complet.png" id="2_fots2"]
 [ext_resource type="Texture2D" uid="uid://ns2ciaww07rl" path="res://gamejam2026spritesheet.png" id="3_slbmu"]
 [ext_resource type="Script" uid="uid://ddp0e0y716e7h" path="res://MatrixPuzzle.gd" id="4_mpz1"]
-[ext_resource type="PackedScene" uid="uid://cext41l5hxvtw" path="res://player_move_scene.tscn" id="5_plyr"]
+[ext_resource type="PackedScene" uid="uid://bi1r8yy4tsvq6" path="res://player.tscn" id="6_r750h"]
 [ext_resource type="Script" uid="uid://bi11kr8vlywaq" path="res://ShiftPiece.gd" id="6_shft"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_slbmu"]
@@ -841,5 +841,5 @@ direction = Vector2i(-1, 0)
 position = Vector2(-0.5, -0.125)
 shape = SubResource("RectangleShape2D_shift")
 
-[node name="Player" parent="." unique_id=930000001 instance=ExtResource("5_plyr")]
+[node name="Player" parent="." unique_id=1575326642 instance=ExtResource("6_r750h")]
 position = Vector2(107, 66)

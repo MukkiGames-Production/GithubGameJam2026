@@ -74,7 +74,7 @@ func _run() -> void:
 	_check(player != null, "player scene is instanced")
 	if player == null:
 		return
-	var body := player.get_node_or_null("CharacterBody2D")
+	var body := player.get_node_or_null("Level/CharacterBody2D")
 	_check(body != null, "player has its CharacterBody2D")
 	if body == null:
 		return

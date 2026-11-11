@@ -1,44 +1,45 @@
-extends MovingEntity
+extends Node2D
+
+@export var tile_size: int = 64
+@export var move_speed: float = 6.0
 
 var inputs := {
-	&"ui_right": Vector2i.RIGHT,
-	&"ui_left":  Vector2i.LEFT,
-	&"ui_up":    Vector2i.UP,
-	&"ui_down":  Vector2i.DOWN,
+	&"ui_right": Vector2.RIGHT,
+	&"ui_left": Vector2.LEFT,
+	&"ui_up": Vector2.UP,
+	&"ui_down": Vector2.DOWN
 }
 
-var desired_dir: Vector2i = Vector2i.ZERO
+var moving := false
+var desired_dir: Vector2 = Vector2.ZERO   # The direction the player currently wants to go
+
+@onready var ray: RayCast2D = $RayCast2D
+
+func _ready() -> void:
+	position = position.snapped(Vector2.ONE * tile_size) + Vector2.ONE * (tile_size / 2.0)
+	ray.collide_with_areas = true
 
 func _unhandled_input(event: InputEvent) -> void:
+	# Update desired direction on press
 	for action in inputs:
 		if event.is_action_pressed(action):
 			desired_dir = inputs[action]
 			if not moving:
-				try_move(desired_dir)
-			return
-
+				try_move()
+			return   # Newest press wins
+	# Clear desired direction when the key is released (optional but feels cleaner)
+	for action in inputs:
 		if event.is_action_released(action) and inputs[action] == desired_dir:
-			desired_dir = Vector2i.ZERO
+			desired_dir = Vector2.ZERO
 			return
 
-func try_move(dir: Vector2i) -> bool:
-	var success := await super.try_move(dir)
-	
-	# Keep moving while the key is held
-	if success and desired_dir != Vector2i.ZERO and not moving:
-		try_move(desired_dir)
-	
-	return success
+func try_move() -> void:
+	if desired_dir == Vector2.ZERO or moving:
+		return
 
-func can_move_to(target: Vector2i, dir: Vector2i) -> bool:
-	var box = level.get_box_at(target)
-	if box:
-		# Try to push the box
-		return await box.try_move(dir)
-	return true
+	ray.target_position = desired_dir * tile_size
+	ray.force_raycast_update()
 
-func _on_move_finished() -> void:
-	level.check_win()
 	if ray.is_colliding():
 		_bump(ray.get_collider())
 		return
@@ -56,8 +57,8 @@ func _on_move_finished() -> void:
 	try_move()
 
 
-## Lets whatever we walked into react, e.g. the shift board shifting the row or
-## column we are pushing against.
+## Lets whatever we walked into react, e.g. a shift piece shifting its row or
+## column.
 func _bump(collider: Object) -> void:
 	var node := collider as Node
 	while node != null:
