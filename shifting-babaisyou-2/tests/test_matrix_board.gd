@@ -74,8 +74,10 @@ func _run() -> void:
 	_check(player != null, "player scene is instanced")
 	if player == null:
 		return
-	var body := player.get_node_or_null("Level/CharacterBody2D")
-	_check(body != null, "player has its CharacterBody2D")
+	var body = player.get_node_or_null("Level/Player")
+	if body == null and player.has_method("try_move"):
+		body = player  # the board instances player.tscn directly
+	_check(body != null, "player node resolved")
 	if body == null:
 		return
 	_check(body.position == Vector2(32, 32), "player snapped onto the 64 px grid")

@@ -2,7 +2,7 @@ extends Node2D
 
 @export var tile_size: int = 64
 @export var move_speed: float = 6.0
-
+@export var level: Node2D
 var inputs := {
 	&"ui_right": Vector2.RIGHT,
 	&"ui_left": Vector2.LEFT,
@@ -40,8 +40,6 @@ func try_move() -> void:
 	ray.target_position = desired_dir * tile_size
 	ray.force_raycast_update()
 
-func _on_move_finished() -> void:
-	level.check_win()
 	if ray.is_colliding():
 		_bump(ray.get_collider())
 		return
@@ -55,8 +53,14 @@ func _on_move_finished() -> void:
 	await tween.finished
 	moving = false
 
+	_on_move_finished()
 	# Immediately try the next move if the player is still holding a direction
 	try_move()
+
+
+func _on_move_finished() -> void:
+	if level != null:
+		level.check_win()
 
 
 ## Lets whatever we walked into react, e.g. a shift piece shifting its row or

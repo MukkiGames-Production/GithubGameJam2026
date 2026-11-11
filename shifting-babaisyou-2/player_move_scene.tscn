@@ -19,7 +19,8 @@ script = ExtResource("1_srx0k")
 walls_layer = NodePath("Walls")
 goals_layer = NodePath("Hazards")
 
-[node name="Player" parent="Level" unique_id=1575326642 instance=ExtResource("2_t44kd")]
+[node name="Player" parent="Level" unique_id=1575326642 node_paths=PackedStringArray("level") instance=ExtResource("2_t44kd")]
+level = NodePath("..")
 
 [node name="Floor" type="TileMapLayer" parent="Level" unique_id=1678928662]
 scale = Vector2(2, 2)
