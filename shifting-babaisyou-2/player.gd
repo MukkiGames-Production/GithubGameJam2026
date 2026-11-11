@@ -30,12 +30,5 @@ func try_move(dir: Vector2i) -> bool:
 	
 	return success
 
-func can_move_to(target: Vector2i, dir: Vector2i) -> bool:
-	var box = level.get_box_at(target)
-	if box:
-		# Try to push the box
-		return await box.try_move(dir)
-	return true
-
 func _on_move_finished() -> void:
 	level.check_win()
