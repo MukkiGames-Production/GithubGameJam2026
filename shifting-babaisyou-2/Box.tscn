@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dvunsvy35sb5b"]
+
+[ext_resource type="Script" uid="uid://dvot5p0bnqgya" path="res://box.gd" id="1_0bkxv"]
+
+[sub_resource type="Gradient" id="Gradient_0bkxv"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_nslow"]
+gradient = SubResource("Gradient_0bkxv")
+
+[node name="Box" type="Node2D" unique_id=348941812]
+script = ExtResource("1_0bkxv")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=100654628]
+position = Vector2(-1.9073486e-06, 0)
+scale = Vector2(0.5, 0.5)
+texture = SubResource("GradientTexture2D_nslow")
