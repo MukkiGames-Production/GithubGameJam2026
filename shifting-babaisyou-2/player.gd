@@ -42,6 +42,7 @@ func try_move() -> void:
 	ray.force_raycast_update()
 
 	if ray.is_colliding():
+		_bump(ray.get_collider())
 		return
 
 	moving = true
@@ -55,3 +56,14 @@ func try_move() -> void:
 
 	# Immediately try the next move if the player is still holding a direction
 	try_move()
+
+
+## Lets whatever we walked into react, e.g. the shift board shifting the row or
+## column we are pushing against.
+func _bump(collider: Object) -> void:
+	var node := collider as Node
+	while node != null:
+		if node.has_method("push_from_player"):
+			node.push_from_player(desired_dir, global_position)
+			return
+		node = node.get_parent()

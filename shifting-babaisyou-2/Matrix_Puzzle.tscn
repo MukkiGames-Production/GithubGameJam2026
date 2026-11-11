@@ -1,10 +1,11 @@
 [gd_scene format=4 uid="uid://b74b44ksjllov"]
 
-[ext_resource type="Shader" uid="uid://d2i84ixxwl5b3" path="res://Matrix_Puzzle.tres" id="1_fots2"]
 [ext_resource type="Texture2D" uid="uid://boutfodedi0y4" path="res://Textures-16.png" id="1_g7g60"]
 [ext_resource type="Texture2D" uid="uid://cfmg4aetsgomh" path="res://tileset_complet.png" id="2_fots2"]
 [ext_resource type="Texture2D" uid="uid://ns2ciaww07rl" path="res://gamejam2026spritesheet.png" id="3_slbmu"]
 [ext_resource type="Script" uid="uid://ddp0e0y716e7h" path="res://MatrixPuzzle.gd" id="4_mpz1"]
+[ext_resource type="PackedScene" uid="uid://cext41l5hxvtw" path="res://player_move_scene.tscn" id="5_plyr"]
+[ext_resource type="Script" uid="uid://bi11kr8vlywaq" path="res://ShiftPiece.gd" id="6_shft"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_slbmu"]
 texture = ExtResource("1_g7g60")
@@ -551,22 +552,8 @@ sources/0 = SubResource("TileSetAtlasSource_slbmu")
 sources/1 = SubResource("TileSetAtlasSource_gltr7")
 sources/2 = SubResource("TileSetAtlasSource_r750h")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_slbmu"]
-shader = ExtResource("1_fots2")
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_7uwkc"]
-size = Vector2(32, 32)
-
-[sub_resource type="QuadMesh" id="QuadMesh_7uwkc"]
-
-[sub_resource type="Curve" id="Curve_7gm7h"]
-_limits = [0.7865169, 1.0, 0.0, 1.0]
-_data = [Vector2(0.13541666, 0.8153012), 0.0, 0.745, 0, 0, Vector2(0.73958325, 0.83449066), 0.0, 0.0, 0, 0, Vector2(0.86458325, 0.92803943), 0.0, 0.0, 0, 0]
-point_count = 3
-
-[sub_resource type="Curve" id="Curve_41a4r"]
-_data = [Vector2(0.5885417, 0.43820232), 0.0, 0.0, 0, 0]
-point_count = 1
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_board"]
+size = Vector2(256, 256)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_floor"]
 atlas = ExtResource("3_slbmu")
@@ -580,12 +567,22 @@ region = Rect2(0, 0, 8, 8)
 atlas = ExtResource("3_slbmu")
 region = Rect2(8, 0, 8, 8)
 
-[sub_resource type="Curve" id="Curve_05wwl"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_144fo"]
+atlas = ExtResource("3_slbmu")
+region = Rect2(0, 8, 8, 8)
 
-[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_144fo"]
-curve_x = SubResource("Curve_7gm7h")
-curve_y = SubResource("Curve_41a4r")
-curve_z = SubResource("Curve_05wwl")
+[sub_resource type="AtlasTexture" id="AtlasTexture_7uwkc"]
+atlas = SubResource("AtlasTexture_144fo")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shift"]
+size = Vector2(7.5, 8.5625)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gltr7"]
+atlas = ExtResource("3_slbmu")
+region = Rect2(16, 8, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r750h"]
+atlas = SubResource("AtlasTexture_gltr7")
 
 [node name="Node2D" type="Node2D" unique_id=954893667]
 
@@ -594,228 +591,245 @@ tile_map_data = PackedByteArray("AAADAAMAAQAFAAUAAAADAAQAAQAFAAQAAAAEAAMAAQAEAAU
 tile_set = SubResource("TileSet_3togr")
 
 [node name="Matrix" type="Node2D" parent="." unique_id=1740770337]
+position = Vector2(-5, 82)
 script = ExtResource("4_mpz1")
 
-[node name="ShapeCast2D" type="ShapeCast2D" parent="Matrix" unique_id=758846319]
-top_level = true
-material = SubResource("ShaderMaterial_slbmu")
-position = Vector2(312, 190)
-shape = SubResource("RectangleShape2D_7uwkc")
-target_position = Vector2(95, 1)
+[node name="BoardCollision" type="StaticBody2D" parent="Matrix" unique_id=920000001]
+position = Vector2(299, 194)
 
-[node name="ShapeCast2D2" type="ShapeCast2D" parent="Matrix" unique_id=495366538]
-top_level = true
-material = SubResource("ShaderMaterial_slbmu")
-position = Vector2(312, 223)
-shape = SubResource("RectangleShape2D_7uwkc")
-target_position = Vector2(95, 1)
-
-[node name="ShapeCast2D3" type="ShapeCast2D" parent="Matrix" unique_id=1561443402]
-top_level = true
-material = SubResource("ShaderMaterial_slbmu")
-position = Vector2(312, 255)
-shape = SubResource("RectangleShape2D_7uwkc")
-target_position = Vector2(95, 1)
-
-[node name="ShapeCast2D4" type="ShapeCast2D" parent="Matrix" unique_id=149958440]
-top_level = true
-material = SubResource("ShaderMaterial_slbmu")
-position = Vector2(312, 288)
-shape = SubResource("RectangleShape2D_7uwkc")
-target_position = Vector2(95, 1)
-
-[node name="ShiftBlock" type="MeshInstance2D" parent="Matrix" unique_id=1014865091]
-position = Vector2(206.75002, 193)
-scale = Vector2(33.5, 30.000002)
-mesh = SubResource("QuadMesh_7uwkc")
-texture = SubResource("CurveXYZTexture_144fo")
-
-[node name="ShiftBlock2" type="MeshInstance2D" parent="Matrix" unique_id=488996892]
-position = Vector2(206.75, 289)
-scale = Vector2(33.5, 30.000002)
-mesh = SubResource("QuadMesh_7uwkc")
-texture = SubResource("CurveXYZTexture_144fo")
-
-[node name="ShiftBlock3" type="MeshInstance2D" parent="Matrix" unique_id=1148532321]
-position = Vector2(206.75, 257)
-scale = Vector2(33.5, 30.000002)
-mesh = SubResource("QuadMesh_7uwkc")
-texture = SubResource("CurveXYZTexture_144fo")
-
-[node name="ShiftBlock4" type="MeshInstance2D" parent="Matrix" unique_id=1773237357]
-position = Vector2(206.75, 226)
-scale = Vector2(33.5, 30.000002)
-mesh = SubResource("QuadMesh_7uwkc")
-texture = SubResource("CurveXYZTexture_144fo")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Matrix/BoardCollision" unique_id=920000002]
+shape = SubResource("RectangleShape2D_board")
 
 [node name="Floor_0_0" type="Sprite2D" parent="Matrix" unique_id=910000001]
-position = Vector2(206, 193)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(203, 98)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(0, 0)
 
 [node name="Floor_0_1" type="Sprite2D" parent="Matrix" unique_id=910000002]
-position = Vector2(238, 193)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(267, 98)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(1, 0)
 
 [node name="Floor_0_2" type="Sprite2D" parent="Matrix" unique_id=910000003]
-position = Vector2(270, 193)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(331, 98)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(2, 0)
 
 [node name="Floor_0_3" type="Sprite2D" parent="Matrix" unique_id=910000004]
-position = Vector2(302, 193)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(395, 98)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(3, 0)
 
 [node name="Floor_1_0" type="Sprite2D" parent="Matrix" unique_id=910000005]
-position = Vector2(206, 225)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(203, 162)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(0, 1)
 
 [node name="Floor_1_1" type="Sprite2D" parent="Matrix" unique_id=910000006]
-position = Vector2(238, 225)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(267, 162)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(1, 1)
 
 [node name="Floor_1_2" type="Sprite2D" parent="Matrix" unique_id=910000007]
-position = Vector2(270, 225)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(331, 162)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(2, 1)
 
 [node name="Floor_1_3" type="Sprite2D" parent="Matrix" unique_id=910000008]
-position = Vector2(302, 225)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(395, 162)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(3, 1)
 
 [node name="Floor_2_0" type="Sprite2D" parent="Matrix" unique_id=910000009]
-position = Vector2(206, 257)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(203, 226)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(0, 2)
 
 [node name="Floor_2_1" type="Sprite2D" parent="Matrix" unique_id=910000010]
-position = Vector2(238, 257)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(267, 226)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(1, 2)
 
 [node name="Floor_2_2" type="Sprite2D" parent="Matrix" unique_id=910000011]
-position = Vector2(270, 257)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(331, 226)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(2, 2)
 
 [node name="Floor_2_3" type="Sprite2D" parent="Matrix" unique_id=910000012]
-position = Vector2(302, 257)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(395, 226)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(3, 2)
 
 [node name="Floor_3_0" type="Sprite2D" parent="Matrix" unique_id=910000013]
-position = Vector2(206, 289)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(203, 290)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(0, 3)
 
 [node name="Floor_3_1" type="Sprite2D" parent="Matrix" unique_id=910000014]
-position = Vector2(238, 289)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(267, 290)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(1, 3)
 
 [node name="Floor_3_2" type="Sprite2D" parent="Matrix" unique_id=910000015]
-position = Vector2(270, 289)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(331, 290)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(2, 3)
 
 [node name="Floor_3_3" type="Sprite2D" parent="Matrix" unique_id=910000016]
-position = Vector2(302, 289)
-texture = SubResource("AtlasTexture_floor")
-texture_filter = 1
-scale = Vector2(4, 4)
 modulate = Color(0.6, 0.65, 0.6, 1)
+texture_filter = 1
+position = Vector2(395, 290)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_floor")
 metadata/floor = true
 metadata/cell = Vector2i(3, 3)
 
 [node name="Piece_1_A" type="Sprite2D" parent="Matrix" unique_id=910000101]
-position = Vector2(206, 193)
-texture = SubResource("AtlasTexture_one")
 texture_filter = 1
-scale = Vector2(4, 4)
+position = Vector2(203, 98)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_one")
+metadata/symbol = "1"
+
+[node name="Piece_1_A2" type="Sprite2D" parent="Matrix" unique_id=1553694057]
+texture_filter = 1
+position = Vector2(332, 98)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_one")
 metadata/symbol = "1"
 
 [node name="Piece_O_A" type="Sprite2D" parent="Matrix" unique_id=910000102]
-position = Vector2(238, 193)
-texture = SubResource("AtlasTexture_zero")
 texture_filter = 1
-scale = Vector2(4, 4)
+position = Vector2(267, 98)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_zero")
 metadata/symbol = "O"
 
 [node name="Piece_O_B" type="Sprite2D" parent="Matrix" unique_id=910000103]
-position = Vector2(270, 257)
-texture = SubResource("AtlasTexture_zero")
 texture_filter = 1
-scale = Vector2(4, 4)
+position = Vector2(331, 226)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_zero")
 metadata/symbol = "O"
 
 [node name="Piece_1_B" type="Sprite2D" parent="Matrix" unique_id=910000104]
-position = Vector2(238, 289)
-texture = SubResource("AtlasTexture_one")
 texture_filter = 1
-scale = Vector2(4, 4)
+position = Vector2(267, 290)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_one")
 metadata/symbol = "1"
+
+[node name="ShiftPiece" type="Sprite2D" parent="." unique_id=398294785]
+texture_filter = 1
+position = Vector2(203, 34)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_7uwkc")
+script = ExtResource("6_shft")
+
+[node name="Body" type="StaticBody2D" parent="ShiftPiece" unique_id=940000001]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftPiece/Body" unique_id=940000002]
+position = Vector2(-0.125, 0)
+shape = SubResource("RectangleShape2D_shift")
+
+[node name="ShiftPiece2" type="Sprite2D" parent="." unique_id=1971598117]
+texture_filter = 1
+position = Vector2(267, 34)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_r750h")
+script = ExtResource("6_shft")
+
+[node name="Body" type="StaticBody2D" parent="ShiftPiece2" unique_id=940000011]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftPiece2/Body" unique_id=940000012]
+position = Vector2(-0.25, 0)
+shape = SubResource("RectangleShape2D_shift")
+
+[node name="ShiftPiece3" type="Sprite2D" parent="." unique_id=1589248969]
+texture_filter = 1
+position = Vector2(331, 34)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_r750h")
+script = ExtResource("6_shft")
+
+[node name="Body" type="StaticBody2D" parent="ShiftPiece3" unique_id=940000021]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftPiece3/Body" unique_id=940000022]
+position = Vector2(-0.375, 0)
+shape = SubResource("RectangleShape2D_shift")
+
+[node name="ShiftPiece4" type="Sprite2D" parent="." unique_id=623426855]
+texture_filter = 1
+position = Vector2(395, 34)
+scale = Vector2(8, 8)
+texture = SubResource("AtlasTexture_r750h")
+script = ExtResource("6_shft")
+
+[node name="Body" type="StaticBody2D" parent="ShiftPiece4" unique_id=940000031]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftPiece4/Body" unique_id=940000032]
+position = Vector2(-0.5, -0.125)
+shape = SubResource("RectangleShape2D_shift")
+
+[node name="Player" parent="." unique_id=930000001 instance=ExtResource("5_plyr")]
+position = Vector2(107, 66)
