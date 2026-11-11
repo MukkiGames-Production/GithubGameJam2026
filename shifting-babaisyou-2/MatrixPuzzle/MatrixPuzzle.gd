@@ -44,7 +44,8 @@ func _ready() -> void:
 
 
 ## Collects the sprite assets authored in the scene. Floors get aligned to the
-## grid; pieces inside the board become the playable tiles.
+## grid; every node in the "PuzzlePiece" group is a spawn template, so a copy
+## of it is spawned onto the board and the template itself stays hidden.
 func _adopt_scene_sprites() -> void:
 	tiles.clear()
 	_start_cells.clear()
@@ -55,13 +56,25 @@ func _adopt_scene_sprites() -> void:
 		if sprite.has_meta("floor"):
 			sprite.scale = Vector2.ONE * (cell_size / SHEET_CELL)
 			sprite.position = cell_center(sprite.get_meta("cell"))
-		elif sprite.has_meta("symbol"):
-			var cell := _cell_of(sprite)
-			if cell.x < 0 or cell.x >= N or cell.y < 0 or cell.y >= N:
-				continue  # spares or decorations outside the board are left alone
-			sprite.scale = Vector2.ONE * (cell_size / SHEET_CELL)
-			tiles.append(sprite)
-			_start_cells[sprite] = cell
+		elif sprite.is_in_group("PuzzlePiece"):
+			_spawn_piece(sprite)
+
+
+## Spawns a board copy of a piece template at the cell the template sits on.
+func _spawn_piece(prototype: Sprite2D) -> void:
+	var cell := _cell_of(prototype)
+	prototype.visible = false  # the authored node is only the spawn template
+	if cell.x < 0 or cell.x >= N or cell.y < 0 or cell.y >= N:
+		return  # templates parked outside the board are not part of the puzzle
+	var tile := prototype.duplicate() as Sprite2D
+	tile.remove_from_group("PuzzlePiece")
+	tile.name = prototype.name + "_tile"
+	tile.scale = Vector2.ONE * (cell_size / SHEET_CELL)
+	tile.position = cell_center(cell)
+	tile.visible = true
+	add_child(tile)
+	tiles.append(tile)
+	_start_cells[tile] = cell
 
 
 func _draw() -> void:
