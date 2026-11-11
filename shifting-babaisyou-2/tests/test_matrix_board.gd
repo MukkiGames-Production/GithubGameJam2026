@@ -33,6 +33,14 @@ func _pieces(state: String) -> int:
 	return count
 
 
+func _count_floor(node: Node) -> int:
+	var count := 0
+	for child in node.get_children():
+		if child is Sprite2D and child.has_meta("floor"):
+			count += 1
+	return count
+
+
 func _run() -> void:
 	var packed: PackedScene = load("res://Matrix_Puzzle.tscn")
 	_check(packed != null, "scene loads")
@@ -49,6 +57,8 @@ func _run() -> void:
 		return
 
 	_check(board.tiles.size() == _pieces(board.state), "one sprite per piece")
+	_check(board.tiles[0].name.begins_with("Piece_"), "board reuses the pieces placed in the scene")
+	_check(_count_floor(scene.get_node("Matrix")) == 16, "exactly the 16 scene floor tiles")
 	_check(board.moves_made == 0, "new game starts at 0 moves")
 
 	# Move a row that actually holds a piece, then undo it.
