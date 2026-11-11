@@ -32,8 +32,7 @@ func world_to_grid(world_pos: Vector2) -> Vector2i:
 	return level.walls_layer.local_to_map(level.walls_layer.to_local(world_pos))
 
 func grid_to_world(grid: Vector2i) -> Vector2:
-	return level.walls_layer.to_global(level.walls_layer.map_to_local(grid)) \
-		+ Vector2(tile_size * 0.5, tile_size * 0.5)
+	return level.walls_layer.to_global(level.walls_layer.map_to_local(grid))
 
 func is_wall(cell: Vector2i) -> bool:
 	return level.is_wall(cell)
@@ -51,12 +50,8 @@ func can_move(dir: Vector2i) -> bool:
 func can_move_to(target: Vector2i, dir: Vector2i) -> bool:
 	var box = level.get_box_at(target)
 	if box:
-		# Recursively check if the next box in the chain can move
-		if box.can_move(dir):
-			# Trigger the box's movement without awaiting so the whole chain slides together
-			box.try_move(dir)
-			return true
-		return false
+		# Checking a chain must not start any movement.
+		return box.can_move(dir)
 	return true
 
 func try_move(dir: Vector2i) -> bool:
@@ -64,6 +59,10 @@ func try_move(dir: Vector2i) -> bool:
 		return false
 
 	var target := grid_pos + dir
+	var box = level.get_box_at(target)
+	if box != null:
+		# The whole chain was validated above; slide it together.
+		box.try_move(dir)
 	moving = true
 
 	# Update registry if this is a box

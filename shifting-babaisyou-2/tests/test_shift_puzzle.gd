@@ -3,7 +3,7 @@ extends SceneTree
 ## Run with:
 ##   godot --headless --path . -s res://tests/test_shift_puzzle.gd
 
-const Puzzle := preload("res://shift_puzzle.gd")
+const Puzzle := preload("res://MatrixPuzzle/shift_puzzle.gd")
 
 var checks := 0
 var failures := 0
