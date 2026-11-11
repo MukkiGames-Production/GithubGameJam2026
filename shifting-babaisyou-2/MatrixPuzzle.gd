@@ -13,7 +13,7 @@ const Puzzle := preload("res://shift_puzzle.gd")
 const N := 4                        # must match ShiftPuzzle.N
 const SHEET_CELL := 8.0             # sprite sheet frame size in pixels
 const TILE_SCALE := 4.0             # 8 px art drawn at 32 px
-const BOARD_ORIGIN := Vector2(224, 224)
+const BOARD_ORIGIN := Vector2(190, 177)
 
 # Atlas frames as (column, row) cells of the 8x8 sprite sheet.
 const FRAME_ONE := Vector2i(0, 0)
@@ -44,6 +44,8 @@ var history: Array = []
 
 var tiles: Array[Sprite2D] = []
 
+var _pool: Array[Sprite2D] = []  # scene-provided pieces not currently on the board
+
 var _dragging := false
 var _drag_start := Vector2.ZERO
 var _drag_cell := Vector2i.ZERO
@@ -55,9 +57,28 @@ var _status_label: Label
 func _ready() -> void:
 	assert(N == Puzzle.N, "MatrixPuzzle.N must match ShiftPuzzle.N")
 	clip_children = CanvasItem.CLIP_CHILDREN_ONLY
-	_build_floor()
+	_adopt_scene_sprites()
 	_build_hud()
 	new_game()
+
+
+## Uses the floor/piece sprites placed in the scene when they are there, so the
+## board is laid out as real assets instead of being generated at runtime.
+func _adopt_scene_sprites() -> void:
+	var has_scene_floor := false
+	for child in get_children():
+		if not child is Sprite2D:
+			continue
+		var sprite := child as Sprite2D
+		sprite.scale = Vector2.ONE * (cell_size / SHEET_CELL)
+		if sprite.has_meta("symbol"):
+			sprite.visible = false
+			_pool.append(sprite)
+		elif sprite.has_meta("floor"):
+			sprite.position = _cell_center(sprite.get_meta("cell"))
+			has_scene_floor = true
+	if not has_scene_floor:
+		_build_floor()
 
 
 func _draw() -> void:
@@ -101,16 +122,28 @@ func _build_floor() -> void:
 
 func _rebuild() -> void:
 	for tile in tiles:
-		tile.queue_free()
+		tile.visible = false
+		_pool.append(tile)
 	tiles.clear()
 	for i in N * N:
 		var ch := state[i]
 		if not TILE_FRAMES.has(ch):
 			continue
-		var tile := _make_sprite(TILE_FRAMES[ch])
+		var tile := _take_piece(ch)
+		tile.visible = true
 		tile.position = _cell_center(Vector2i(i % N, i / N))
-		add_child(tile)
 		tiles.append(tile)
+
+
+func _take_piece(ch: String) -> Sprite2D:
+	for i in _pool.size():
+		if _pool[i].get_meta("symbol", "") == ch:
+			return _pool.pop_at(i)
+	# The scene only had spares for other pieces: build one from the atlas.
+	var tile := _make_sprite(TILE_FRAMES[ch])
+	tile.set_meta("symbol", ch)
+	add_child(tile)
+	return tile
 
 
 # --- game flow -------------------------------------------------------------
