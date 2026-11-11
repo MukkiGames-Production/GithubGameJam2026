@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://cext41l5hxvtw"]
 
-[ext_resource type="Script" uid="uid://bylro6yjaikwo" path="res://level.gd" id="1_srx0k"]
-[ext_resource type="PackedScene" uid="uid://dvunsvy35sb5b" path="res://Box.tscn" id="2_fvauv"]
-[ext_resource type="PackedScene" uid="uid://bi1r8yy4tsvq6" path="res://player.tscn" id="2_t44kd"]
+[ext_resource type="Script" uid="uid://bylro6yjaikwo" path="res://LevelManagement/level.gd" id="1_srx0k"]
+[ext_resource type="PackedScene" uid="uid://dvunsvy35sb5b" path="res://MovingEntities/Box/Box.tscn" id="2_fvauv"]
+[ext_resource type="PackedScene" uid="uid://bi1r8yy4tsvq6" path="res://MovingEntities/Player/player.tscn" id="2_t44kd"]
 
 [sub_resource type="TileSet" id="TileSet_fvauv"]
 
