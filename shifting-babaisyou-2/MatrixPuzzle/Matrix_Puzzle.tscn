@@ -1,11 +1,14 @@
 [gd_scene format=4 uid="uid://b74b44ksjllov"]
 
+[ext_resource type="Texture2D" path="res://Graphics/Textures-16.png" id="1_floor"]
+[ext_resource type="Texture2D" path="res://Graphics/tileset_complet.png" id="2_tiles"]
 [ext_resource type="Texture2D" uid="uid://ns2ciaww07rl" path="res://Graphics/gamejam2026spritesheet.png" id="3_8bm6r"]
-[ext_resource type="Script" uid="uid://k3uh65hisfgn" path="res://MatrixPuzzle/MatrixPuzzle.gd" id="4_46je4"]
+[ext_resource type="Script" path="res://MatrixPuzzle/MatrixPuzzle.gd" id="4_46je4"]
 [ext_resource type="Script" uid="uid://douh0g5k3eggg" path="res://MatrixPuzzle/ShiftPiece.gd" id="5_xihmc"]
 [ext_resource type="PackedScene" uid="uid://bi1r8yy4tsvq6" path="res://MovingEntities/Player/player.tscn" id="6_brs24"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_slbmu"]
+texture = ExtResource("1_floor")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -446,6 +449,7 @@
 21:10/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_gltr7"]
+texture = ExtResource("2_tiles")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0

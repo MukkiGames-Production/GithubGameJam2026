@@ -1,0 +1,63 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://LevelManagement/level.gd" id="1"]
+[ext_resource type="PackedScene" path="res://MovingEntities/Box/Box.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://MovingEntities/Player/player.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://SignalTile.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://Gate/gate.tscn" id="5"]
+
+[sub_resource type="TileSet" id="Grid"]
+tile_size = Vector2i(16, 16)
+
+[node name="PlayerMoveScene2" type="Node2D"]
+
+[node name="Level" type="Node2D" parent="." node_paths=PackedStringArray("walls_layer")]
+script = ExtResource("1")
+walls_layer = NodePath("Walls")
+
+[node name="Player" parent="Level" instance=ExtResource("3")]
+position = Vector2(80, 80)
+tile_size = 32
+
+[node name="Floor" type="TileMapLayer" parent="Level"]
+scale = Vector2(2, 2)
+tile_set = SubResource("Grid")
+
+[node name="Walls" type="TileMapLayer" parent="Level"]
+scale = Vector2(2, 2)
+tile_set = SubResource("Grid")
+
+[node name="Modifiers" type="TileMapLayer" parent="Level"]
+scale = Vector2(2, 2)
+tile_set = SubResource("Grid")
+
+[node name="Hazards" type="TileMapLayer" parent="Level"]
+scale = Vector2(2, 2)
+tile_set = SubResource("Grid")
+
+[node name="SourceA" parent="Level" node_paths=PackedStringArray("destinations") instance=ExtResource("4")]
+position = Vector2(80, 112)
+destinations = Array[NodePath]([NodePath("../OutputTile")])
+
+[node name="SourceB" parent="Level" node_paths=PackedStringArray("destinations") instance=ExtResource("4")]
+position = Vector2(144, 112)
+destinations = Array[NodePath]([NodePath("../OutputTile")])
+
+[node name="OutputTile" parent="Level" node_paths=PackedStringArray("receivers") instance=ExtResource("4")]
+position = Vector2(208, 112)
+receivers = Array[NodePath]([NodePath("../Gate")])
+
+[node name="Gate" parent="Level" instance=ExtResource("5")]
+position = Vector2(272, 112)
+
+[node name="Boxes" type="Node2D" parent="Level"]
+
+[node name="Box1" parent="Level/Boxes" instance=ExtResource("2")]
+position = Vector2(80, 112)
+tile_size = 32
+val = "1"
+
+[node name="Box0" parent="Level/Boxes" instance=ExtResource("2")]
+position = Vector2(144, 112)
+tile_size = 32
+val = "0"
