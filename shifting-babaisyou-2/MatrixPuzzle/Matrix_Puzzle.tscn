@@ -1,14 +1,11 @@
 [gd_scene format=4 uid="uid://b74b44ksjllov"]
 
-[ext_resource type="Texture2D" uid="uid://boutfodedi0y4" path="res://Textures-16.png" id="1_g7g60"]
-[ext_resource type="Texture2D" uid="uid://cfmg4aetsgomh" path="res://tileset_complet.png" id="2_fots2"]
-[ext_resource type="Texture2D" uid="uid://ns2ciaww07rl" path="res://gamejam2026spritesheet.png" id="3_slbmu"]
-[ext_resource type="Script" uid="uid://ddp0e0y716e7h" path="res://MatrixPuzzle.gd" id="4_mpz1"]
-[ext_resource type="PackedScene" uid="uid://bi1r8yy4tsvq6" path="res://player.tscn" id="6_r750h"]
-[ext_resource type="Script" uid="uid://bi11kr8vlywaq" path="res://ShiftPiece.gd" id="6_shft"]
+[ext_resource type="Texture2D" uid="uid://ns2ciaww07rl" path="res://Graphics/gamejam2026spritesheet.png" id="3_8bm6r"]
+[ext_resource type="Script" uid="uid://k3uh65hisfgn" path="res://MatrixPuzzle/MatrixPuzzle.gd" id="4_46je4"]
+[ext_resource type="Script" uid="uid://douh0g5k3eggg" path="res://MatrixPuzzle/ShiftPiece.gd" id="5_xihmc"]
+[ext_resource type="PackedScene" uid="uid://bi1r8yy4tsvq6" path="res://MovingEntities/Player/player.tscn" id="6_brs24"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_slbmu"]
-texture = ExtResource("1_g7g60")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -449,7 +446,6 @@ texture = ExtResource("1_g7g60")
 21:10/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_gltr7"]
-texture = ExtResource("2_fots2")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -528,7 +524,7 @@ texture = ExtResource("2_fots2")
 9:5/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_r750h"]
-texture = ExtResource("3_slbmu")
+texture = ExtResource("3_8bm6r")
 texture_region_size = Vector2i(8, 8)
 0:0/0 = 0
 1:0/0 = 0
@@ -556,29 +552,33 @@ sources/2 = SubResource("TileSetAtlasSource_r750h")
 size = Vector2(256, 256)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_floor"]
-atlas = ExtResource("3_slbmu")
+atlas = ExtResource("3_8bm6r")
 region = Rect2(0, 24, 8, 8)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_one"]
-atlas = ExtResource("3_slbmu")
+atlas = ExtResource("3_8bm6r")
 region = Rect2(0, 0, 8, 8)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_zero"]
-atlas = ExtResource("3_slbmu")
+atlas = ExtResource("3_8bm6r")
 region = Rect2(8, 0, 8, 8)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_gltr7"]
-atlas = ExtResource("3_slbmu")
+[sub_resource type="AtlasTexture" id="AtlasTexture_ovc1i"]
+atlas = ExtResource("3_8bm6r")
+region = Rect2(8, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4sx27"]
+atlas = ExtResource("3_8bm6r")
 region = Rect2(16, 8, 8, 8)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_r750h"]
-atlas = SubResource("AtlasTexture_gltr7")
+atlas = SubResource("AtlasTexture_4sx27")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_shift"]
 size = Vector2(7.5, 8.5625)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_144fo"]
-atlas = ExtResource("3_slbmu")
+atlas = ExtResource("3_8bm6r")
 region = Rect2(0, 8, 8, 8)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7uwkc"]
@@ -593,7 +593,7 @@ tile_set = SubResource("TileSet_3togr")
 
 [node name="Matrix" type="Node2D" parent="." unique_id=1740770337]
 position = Vector2(45, 234)
-script = ExtResource("4_mpz1")
+script = ExtResource("4_46je4")
 
 [node name="BoardCollision" type="StaticBody2D" parent="Matrix" unique_id=920000001]
 position = Vector2(299, 194)
@@ -777,7 +777,7 @@ metadata/symbol = "O"
 texture_filter = 1
 position = Vector2(396, 226)
 scale = Vector2(8, 8)
-texture = SubResource("AtlasTexture_zero")
+texture = SubResource("AtlasTexture_ovc1i")
 metadata/symbol = "O"
 
 [node name="Piece_1_B" type="Sprite2D" parent="Matrix" unique_id=910000104 groups=["PuzzlePiece"]]
@@ -793,7 +793,7 @@ position = Vector2(288, 96)
 rotation = -1.5707964
 scale = Vector2(8, 8)
 texture = SubResource("AtlasTexture_r750h")
-script = ExtResource("6_shft")
+script = ExtResource("5_xihmc")
 direction = Vector2i(0, -1)
 
 [node name="Body" type="StaticBody2D" parent="ShiftUpPiece" unique_id=940000001]
@@ -807,7 +807,7 @@ position = Vector2(413, 91)
 rotation = 1.5707964
 scale = Vector2(8, 8)
 texture = SubResource("AtlasTexture_r750h")
-script = ExtResource("6_shft")
+script = ExtResource("5_xihmc")
 direction = Vector2i(0, 1)
 
 [node name="Body" type="StaticBody2D" parent="ShiftDownPiece" unique_id=940000011]
@@ -820,7 +820,7 @@ texture_filter = 1
 position = Vector2(96, 288)
 scale = Vector2(8, 8)
 texture = SubResource("AtlasTexture_r750h")
-script = ExtResource("6_shft")
+script = ExtResource("5_xihmc")
 direction = Vector2i(-1, 0)
 
 [node name="Body" type="StaticBody2D" parent="ShiftLeftPiece" unique_id=940000021]
@@ -834,12 +834,12 @@ position = Vector2(537.00006, 289.00003)
 rotation = 0.0436692
 scale = Vector2(8, 8)
 texture = SubResource("AtlasTexture_7uwkc")
-script = ExtResource("6_shft")
+script = ExtResource("5_xihmc")
 
 [node name="Body" type="StaticBody2D" parent="ShiftRightPiece" unique_id=940000031]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ShiftRightPiece/Body" unique_id=940000032]
 shape = SubResource("RectangleShape2D_shift")
 
-[node name="Player" parent="." unique_id=1575326642 instance=ExtResource("6_r750h")]
+[node name="Player" parent="." unique_id=1575326642 instance=ExtResource("6_brs24")]
 position = Vector2(107, 66)
