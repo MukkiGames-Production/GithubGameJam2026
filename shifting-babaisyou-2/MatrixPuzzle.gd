@@ -3,8 +3,8 @@ extends Node2D
 ## 2D matrix puzzle board.
 ##
 ## Rules live in shift_puzzle.gd (no nodes); this node only renders, animates
-## and handles input. The pieces are the sprites authored in the scene: the
-## board reads its starting layout from them and never builds tiles at runtime.
+## and handles input. Pieces only move when a shift piece is bumped: the board
+## itself is just a wall and has no direct input.
 
 signal moved(moves: int)
 signal solved(moves: int)
@@ -30,9 +30,6 @@ var tiles: Array[Sprite2D] = []    # the piece sprites authored in the scene
 
 var _start_cells: Dictionary = {}  # tile -> cell it was authored on
 
-var _dragging := false
-var _drag_start := Vector2.ZERO
-var _drag_cell := Vector2i.ZERO
 var _hud: CanvasLayer
 var _moves_label: Label
 var _status_label: Label
@@ -172,15 +169,19 @@ func _do_move(kind: String, idx: int, n: int) -> void:
 		_win_flash()
 
 
-## Shifts the board line aligned with cell in the direction of push. Called by
-## the shift pieces around the board.
+## Shifts the board line aligned with cell in the given direction. Called by
+## shift pieces; a horizontal direction shifts a row, a vertical one a column.
 func shift_line(cell: Vector2i, push: Vector2) -> void:
 	if busy or push == Vector2.ZERO:
 		return
 	if absf(push.x) > absf(push.y):
-		_do_move("row", clampi(cell.y, 0, N - 1), -int(signf(push.x)))
+		# Above/below the board the piece's column picks the row it controls.
+		var row := cell.y if cell.y >= 0 and cell.y < N else cell.x
+		_do_move("row", clampi(row, 0, N - 1), -int(signf(push.x)))
 	else:
-		_do_move("col", clampi(cell.x, 0, N - 1), int(signf(push.y)))
+		# Beside the board the piece's row picks the column it controls.
+		var col := cell.x if cell.x >= 0 and cell.x < N else cell.y
+		_do_move("col", clampi(col, 0, N - 1), int(signf(push.y)))
 
 
 func _line_has_piece(kind: String, idx: int) -> bool:
@@ -264,53 +265,6 @@ func _flash_line(move: Array) -> void:
 		tween.tween_property(tile, "self_modulate", Color.WHITE, 0.15)
 
 
-# --- input -----------------------------------------------------------------
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey:
-		var key := event as InputEventKey
-		if key.pressed and not key.echo:
-			match key.keycode:
-				KEY_R:
-					new_game()
-				KEY_U:
-					undo()
-				KEY_H:
-					hint()
-				KEY_S:
-					play_solution()
-		return
-
-	if not event is InputEventMouseButton or busy:
-		return
-	var mouse := event as InputEventMouseButton
-	if mouse.button_index != MOUSE_BUTTON_LEFT:
-		return
-
-	var local := to_local(get_global_mouse_position())
-	if mouse.pressed:
-		if _board_rect().has_point(local):
-			_dragging = true
-			_drag_start = local
-			_drag_cell = Vector2i(((local - board_origin) / cell_size).floor())
-	else:
-		_finish_drag(local)
-
-
-func _finish_drag(local: Vector2) -> void:
-	if not _dragging:
-		return
-	_dragging = false
-	var delta := local - _drag_start
-	if delta.length() < cell_size * 0.4:
-		return
-	if absf(delta.x) > absf(delta.y):
-		# Drag right shifts right, which is a negative left shift.
-		_do_move("row", _drag_cell.y, -clampi(roundi(delta.x / cell_size), 1, N / 2))
-	else:
-		_do_move("col", _drag_cell.x, clampi(roundi(delta.y / cell_size), 1, N / 2))
-
-
 # --- HUD -------------------------------------------------------------------
 
 func _build_hud() -> void:
@@ -328,10 +282,10 @@ func _build_hud() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	box.add_child(row)
-	row.add_child(_button("New Game (R)", new_game))
-	row.add_child(_button("Undo (U)", undo))
-	row.add_child(_button("Hint (H)", hint))
-	row.add_child(_button("Solve (S)", play_solution))
+	row.add_child(_button("New Game", new_game))
+	row.add_child(_button("Undo", undo))
+	row.add_child(_button("Hint", hint))
+	row.add_child(_button("Solve", play_solution))
 
 	_moves_label = Label.new()
 	box.add_child(_moves_label)
@@ -341,7 +295,7 @@ func _build_hud() -> void:
 	box.add_child(_status_label)
 
 	var help := Label.new()
-	help.text = "Drag a row or column to shift it."
+	help.text = "Walk into an arrow piece to shift its line."
 	help.add_theme_font_size_override("font_size", 12)
 	help.modulate = Color(1, 1, 1, 0.6)
 	box.add_child(help)

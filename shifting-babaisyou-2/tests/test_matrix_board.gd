@@ -41,9 +41,10 @@ func _count_floor(node: Node) -> int:
 	return count
 
 
-func _col_has_piece(state: String, col: int) -> bool:
-	for row in 4:
-		if state[row * 4 + col] != ".":
+func _line_has_piece(state: String, is_row: bool, idx: int) -> bool:
+	for i in 4:
+		var cell := Vector2i(i, idx) if is_row else Vector2i(idx, i)
+		if state[cell.y * 4 + cell.x] != ".":
 			return true
 	return false
 
@@ -95,36 +96,48 @@ func _run() -> void:
 	_check(board.state == before, "undo restores the state")
 	_check(board.moves_made == 0, "undo clears the move count")
 
-	# Shifting is done through the arrow pieces, not by bumping the board.
+	# Shifting is done through the arrow pieces, in their own direction.
 	_check(not board.has_method("push_from_player"), "board ignores direct bumps")
 	var piece = null
-	for node_name in ["ShiftPiece", "ShiftPiece2", "ShiftPiece3", "ShiftPiece4"]:
-		var candidate = scene.get_node_or_null(node_name)
-		if candidate != null and _col_has_piece(board.state, clampi(candidate.cell.x, 0, 3)):
-			piece = candidate
+	for node_name in ["ShiftRightPiece", "ShiftRightPiece2", "ShiftLeftPiece", "ShiftLeftPiece2"]:
+		piece = scene.get_node_or_null(node_name)
+		if piece != null:
 			break
-	if piece == null:
-		piece = scene.get_node_or_null("ShiftPiece")
 	_check(piece != null and piece.has_method("push_from_player"), "shift pieces are interactive")
 	if piece == null:
 		return
 	_check(piece.global_position == board.to_global(board.cell_center(piece.cell)), "shift piece snapped onto the board grid")
 
-	# The scene layout is free-form: make sure the crank's column has a piece.
-	var piece_col: int = clampi(piece.cell.x, 0, 3)
-	if not _col_has_piece(board.state, piece_col):
-		for row in 4:
-			if board.state[row * 4 + piece_col] == ".":
-				board.tiles[0].position = board.cell_center(Vector2i(piece_col, row))
+	# Work out the line the piece cranks, the same way MatrixPuzzle does.
+	var dir: Vector2i = piece.direction
+	var is_row: bool = dir.x != 0
+	var line_idx: int
+	if is_row:
+		line_idx = piece.cell.y if piece.cell.y >= 0 and piece.cell.y < 4 else piece.cell.x
+	else:
+		line_idx = piece.cell.x if piece.cell.x >= 0 and piece.cell.x < 4 else piece.cell.y
+	line_idx = clampi(line_idx, 0, 3)
+
+	# The scene layout is free-form: make sure the crank's line has a piece.
+	if not _line_has_piece(board.state, is_row, line_idx):
+		for i in 4:
+			var cell := Vector2i(i, line_idx) if is_row else Vector2i(line_idx, i)
+			if board.state[cell.y * 4 + cell.x] == ".":
+				board.tiles[0].position = board.cell_center(cell)
 				break
 		board.state = board._state_from_tiles()
-	_check(_col_has_piece(board.state, piece_col), "shift piece column holds a piece")
+	_check(_line_has_piece(board.state, is_row, line_idx), "crank line holds a piece")
 
 	var before_push: String = board.state
-	body.desired_dir = Vector2.DOWN
+	body.desired_dir = Vector2.DOWN  # the push direction must not matter
 	body._bump(piece.get_node("Body/CollisionShape2D"))
 	await create_timer(0.8).timeout
-	_check(board.state == Puzzle.shift_col(before_push, piece_col, 1), "shift piece shifts its column downwards")
+	var expected: String = before_push
+	if is_row:
+		expected = Puzzle.shift_row(expected, line_idx, -int(signf(dir.x)))
+	else:
+		expected = Puzzle.shift_col(expected, line_idx, int(signf(dir.y)))
+	_check(board.state == expected, "shift piece shifts its line in its own direction")
 
 	# The Solve path runs the solver and lands the board solved.
 	board.state = "1....O.........."
