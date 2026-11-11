@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://ome8hxlo5c6o"]
+[gd_scene format=3 uid="uid://ome8hxlo5c6o"]
 
 [ext_resource type="PackedScene" path="res://Gate/gate.tscn" id="1"]
 

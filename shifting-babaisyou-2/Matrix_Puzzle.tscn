@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://crb2egofmhrry"]
+[gd_scene format=3 uid="uid://crb2egofmhrry"]
 
 [ext_resource type="PackedScene" path="res://MatrixPuzzle/Matrix_Puzzle.tscn" id="1"]
 
