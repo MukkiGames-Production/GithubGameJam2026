@@ -567,7 +567,6 @@ region = Rect2(0, 0, 8, 8)
 atlas = ExtResource("3_8bm6r")
 region = Rect2(8, 0, 8, 8)
 
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_gltr7"]
 atlas = ExtResource("3_8bm6r")
 region = Rect2(16, 8, 8, 8)
