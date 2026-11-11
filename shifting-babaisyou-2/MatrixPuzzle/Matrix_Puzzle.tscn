@@ -1,14 +1,11 @@
 [gd_scene format=4 uid="uid://b74b44ksjllov"]
 
-[ext_resource type="Texture2D" uid="uid://boutfodedi0y4" path="res://Textures-16.png" id="1_50dua"]
-[ext_resource type="Texture2D" uid="uid://cfmg4aetsgomh" path="res://tileset_complet.png" id="2_j4aif"]
 [ext_resource type="Texture2D" uid="uid://ns2ciaww07rl" path="res://Graphics/gamejam2026spritesheet.png" id="3_8bm6r"]
-[ext_resource type="Script" uid="uid://ddp0e0y716e7h" path="res://MatrixPuzzle/MatrixPuzzle.gd" id="4_46je4"]
-[ext_resource type="Script" uid="uid://bipp0chgj00gr" path="res://MatrixPuzzle/ShiftPiece.gd" id="5_xihmc"]
+[ext_resource type="Script" uid="uid://k3uh65hisfgn" path="res://MatrixPuzzle/MatrixPuzzle.gd" id="4_46je4"]
+[ext_resource type="Script" uid="uid://douh0g5k3eggg" path="res://MatrixPuzzle/ShiftPiece.gd" id="5_xihmc"]
 [ext_resource type="PackedScene" uid="uid://bi1r8yy4tsvq6" path="res://MovingEntities/Player/player.tscn" id="6_brs24"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_slbmu"]
-texture = ExtResource("1_50dua")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -449,7 +446,6 @@ texture = ExtResource("1_50dua")
 21:10/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_gltr7"]
-texture = ExtResource("2_j4aif")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -567,12 +563,16 @@ region = Rect2(0, 0, 8, 8)
 atlas = ExtResource("3_8bm6r")
 region = Rect2(8, 0, 8, 8)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_gltr7"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_ovc1i"]
+atlas = ExtResource("3_8bm6r")
+region = Rect2(8, 0, 8, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4sx27"]
 atlas = ExtResource("3_8bm6r")
 region = Rect2(16, 8, 8, 8)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_r750h"]
-atlas = SubResource("AtlasTexture_gltr7")
+atlas = SubResource("AtlasTexture_4sx27")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_shift"]
 size = Vector2(7.5, 8.5625)
@@ -777,7 +777,7 @@ metadata/symbol = "O"
 texture_filter = 1
 position = Vector2(396, 226)
 scale = Vector2(8, 8)
-texture = SubResource("AtlasTexture_zero")
+texture = SubResource("AtlasTexture_ovc1i")
 metadata/symbol = "O"
 
 [node name="Piece_1_B" type="Sprite2D" parent="Matrix" unique_id=910000104 groups=["PuzzlePiece"]]

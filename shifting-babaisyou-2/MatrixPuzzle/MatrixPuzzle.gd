@@ -9,7 +9,7 @@ extends Node2D
 signal moved(moves: int)
 signal solved(moves: int)
 
-const Puzzle := preload("res://shift_puzzle.gd")
+const Puzzle := preload("shift_puzzle.gd")
 
 const N := 4                        # must match ShiftPuzzle.N
 const SHEET_CELL := 8.0             # sprite sheet frame size in pixels
