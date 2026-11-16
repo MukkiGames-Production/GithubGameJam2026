@@ -20,6 +20,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.is_action_released(action) and inputs[action] == desired_dir:
 			desired_dir = Vector2i.ZERO
 			return
+		if event is InputEventKey and event.pressed and not event.echo:
+			if event.keycode == KEY_P:
+				var boxes = get_tree().get_nodes_in_group("boxes")
+				if boxes.size() > 0:
+					var box = boxes[0] as Box
+					var new_seg = box.extend(Vector2i.RIGHT, "1")
+					if new_seg:
+						print("Extended successfully → new offset ", new_seg.offset)
+					else:
+						print("Extend failed (blocked or invalid direction)")
 
 func try_move(dir: Vector2i) -> bool:
 	var success := await super.try_move(dir)

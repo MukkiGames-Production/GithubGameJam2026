@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cext41l5hxvtw"]
 
-[ext_resource type="Script" path="res://LevelManagement/level.gd" id="1_srx0k"]
+[ext_resource type="Script" uid="uid://cw74yc0xlii1g" path="res://LevelManagement/level.gd" id="1_srx0k"]
 [ext_resource type="PackedScene" uid="uid://dvunsvy35sb5b" path="res://MovingEntities/Box/Box.tscn" id="2_fvauv"]
 [ext_resource type="PackedScene" uid="uid://bi1r8yy4tsvq6" path="res://MovingEntities/Player/player.tscn" id="2_t44kd"]
 
@@ -39,8 +39,8 @@ tile_set = SubResource("TileSet_hfws3")
 
 [node name="Boxes" type="Node2D" parent="Level" unique_id=2003082193]
 
-[node name="Box1" parent="Level/Boxes" unique_id=348941812 instance=ExtResource("2_fvauv")]
-position = Vector2(510, 171)
+[node name="Box" parent="Level/Boxes" unique_id=348941812 instance=ExtResource("2_fvauv")]
+position = Vector2(64, 63)
 
 [node name="Box2" parent="Level/Boxes" unique_id=1863902041 instance=ExtResource("2_fvauv")]
-position = Vector2(426, 148)
+position = Vector2(108, 67)

@@ -9,21 +9,23 @@ var _signal_update_pending := false
 var signal_errors: Array[String] = []
 
 func _ready() -> void:
-	# Register every box that is already in the scene
 	for box in get_tree().get_nodes_in_group("boxes"):
 		if is_ancestor_of(box):
 			register_box(box)
 	request_signal_update()
 
-func register_box(box: MovingEntity) -> void:
-	boxes[box.grid_pos] = box
+func register_box(box: Box) -> void:
+	for segment in box.segments:
+		var cell: Vector2i = box.grid_pos + segment.offset
+		boxes[cell] = box
 	request_signal_update()
 
-func unregister_box(box: MovingEntity) -> void:
-	if boxes.get(box.grid_pos) == box:
-		boxes.erase(box.grid_pos)
+func unregister_box(box: Box) -> void:
+	for segment in box.segments:
+		var cell: Vector2i = box.grid_pos + segment.offset
+		if boxes.get(cell) == box:
+			boxes.erase(cell)
 	request_signal_update()
-
 
 ## Deferred so a whole chain of pushed boxes updates as one board change.
 func request_signal_update() -> void:
@@ -98,7 +100,7 @@ func recalculate_signals() -> void:
 			values = results[tile]
 		tile.publish(values)
 
-func get_box_at(cell: Vector2i) -> MovingEntity:
+func get_box_at(cell: Vector2i) -> Box:
 	return boxes.get(cell)
 
 func is_wall(cell: Vector2i) -> bool:
