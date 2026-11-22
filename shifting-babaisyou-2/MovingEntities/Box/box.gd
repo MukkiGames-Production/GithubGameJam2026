@@ -59,7 +59,6 @@ func try_move(dir: Vector2i) -> bool:
 	_do_move(dir)
 	return true
 
-
 func _do_move(dir: Vector2i) -> void:
 	var target := grid_pos + dir
 	moving = true
@@ -68,19 +67,9 @@ func _do_move(dir: Vector2i) -> void:
 	grid_pos = target
 	level.register_box(self)
 
-	# Move every segment visually
-	for segment in segments:
-		segment.global_position = grid_to_world(grid_pos + segment.offset)
-
 	var tween := create_tween()
 	tween.tween_property(self, "global_position", grid_to_world(grid_pos), 1.0 / move_speed)\
 		.set_trans(Tween.TRANS_SINE)
-
-	# Also tween the segments so they stay in sync (optional but looks better)
-	for segment in segments:
-		tween.parallel().tween_property(segment, "global_position",
-			grid_to_world(grid_pos + segment.offset), 1.0 / move_speed)\
-			.set_trans(Tween.TRANS_SINE)
 
 	await tween.finished
 	moving = false

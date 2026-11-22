@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://cbmxfibqr2t7g"]
+
+[ext_resource type="Script" uid="uid://cw74yc0xlii1g" path="res://LevelManagement/level.gd" id="1_2kvvy"]
+[ext_resource type="PackedScene" uid="uid://bi1r8yy4tsvq6" path="res://MovingEntities/Player/player.tscn" id="2_7a8pb"]
+[ext_resource type="PackedScene" uid="uid://dvunsvy35sb5b" path="res://MovingEntities/Box/Box.tscn" id="3_dd3ly"]
+[ext_resource type="PackedScene" uid="uid://bfngocxflhkmw" path="res://WorldObjects/Goal/Goal.tscn" id="3_kukhq"]
+
+[sub_resource type="TileSet" id="TileSet_fvauv"]
+
+[sub_resource type="TileSet" id="TileSet_t44kd"]
+
+[sub_resource type="TileSet" id="TileSet_rfxws"]
+
+[sub_resource type="TileSet" id="TileSet_hfws3"]
+
+[node name="Level" type="Node2D" unique_id=1650857934 node_paths=PackedStringArray("walls_layer")]
+script = ExtResource("1_2kvvy")
+walls_layer = NodePath("Walls")
+
+[node name="Player" parent="." unique_id=1575326642 instance=ExtResource("2_7a8pb")]
+position = Vector2(386, 144)
+
+[node name="Floor" type="TileMapLayer" parent="." unique_id=2025402108]
+scale = Vector2(2, 2)
+tile_set = SubResource("TileSet_fvauv")
+
+[node name="Walls" type="TileMapLayer" parent="." unique_id=2021954638]
+scale = Vector2(2, 2)
+tile_set = SubResource("TileSet_t44kd")
+
+[node name="Modifiers" type="TileMapLayer" parent="." unique_id=1371582339]
+scale = Vector2(2, 2)
+tile_set = SubResource("TileSet_rfxws")
+
+[node name="Hazards" type="TileMapLayer" parent="." unique_id=603197292]
+scale = Vector2(2, 2)
+tile_set = SubResource("TileSet_hfws3")
+
+[node name="Boxes" type="Node2D" parent="." unique_id=1765668326]
+
+[node name="Box" parent="Boxes" unique_id=348941812 instance=ExtResource("3_dd3ly")]
+position = Vector2(64, 63)
+
+[node name="Box2" parent="Boxes" unique_id=1854147729 instance=ExtResource("3_dd3ly")]
+position = Vector2(108, 67)
+
+[node name="Goal" parent="." unique_id=72610145 instance=ExtResource("3_kukhq")]
+position = Vector2(467, 210)

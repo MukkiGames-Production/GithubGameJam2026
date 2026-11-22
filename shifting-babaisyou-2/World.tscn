@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cext41l5hxvtw"]
+
+[ext_resource type="Script" uid="uid://yccixvnkl2yd" path="res://World.gd" id="1_eu7l1"]
+[ext_resource type="PackedScene" uid="uid://cfq73vexyiolf" path="res://Levels/test_level.tscn" id="2_2dftf"]
+[ext_resource type="PackedScene" uid="uid://cbmxfibqr2t7g" path="res://Levels/test_level2.tscn" id="3_bcbcq"]
+
+[node name="World" type="Node2D" unique_id=532175261]
+script = ExtResource("1_eu7l1")
+levels = Array[PackedScene]([ExtResource("2_2dftf"), ExtResource("3_bcbcq")])

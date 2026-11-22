@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bfngocxflhkmw"]
+
+[ext_resource type="Script" uid="uid://c33li6xvevll6" path="res://WorldObjects/Goal/goal.gd" id="1_crjdy"]
+
+[sub_resource type="Gradient" id="Gradient_mx5to"]
+colors = PackedColorArray(0, 1, 0, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_nslow"]
+gradient = SubResource("Gradient_mx5to")
+width = 32
+height = 32
+
+[node name="Goal" type="Node2D" unique_id=72610145]
+script = ExtResource("1_crjdy")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1313196253]
+texture = SubResource("GradientTexture2D_nslow")

@@ -1,18 +1,24 @@
 extends Node2D
 
 @export var walls_layer: TileMapLayer
-@export var goals_layer: TileMapLayer   # optional
 
 var boxes: Dictionary = {}   # Vector2i → Box
 
+signal level_completed
+
 var _signal_update_pending := false
 var signal_errors: Array[String] = []
+
+var goal: Goal
 
 func _ready() -> void:
 	for box in get_tree().get_nodes_in_group("boxes"):
 		if is_ancestor_of(box):
 			register_box(box)
 	request_signal_update()
+	for goal in get_tree().get_nodes_in_group("goal"):
+		if is_ancestor_of(goal):
+			self.goal = goal
 
 func register_box(box: Box) -> void:
 	for segment in box.segments:
@@ -33,7 +39,6 @@ func request_signal_update() -> void:
 		return
 	_signal_update_pending = true
 	recalculate_signals.call_deferred()
-
 
 func recalculate_signals() -> void:
 	_signal_update_pending = false
@@ -106,17 +111,13 @@ func get_box_at(cell: Vector2i) -> Box:
 func is_wall(cell: Vector2i) -> bool:
 	return walls_layer.get_cell_source_id(cell) != -1
 
-func check_win() -> bool:
-	if goals_layer == null:
+func check_win(player_grid_pos):
+	if player_grid_pos != goal.grid_pos:
 		return false
-	
-	var goals := goals_layer.get_used_cells()
-	if goals.is_empty():
-		return false
-	
-	for goal in goals:
-		if get_box_at(goal) == null:
-			return false
 	
 	print("Level Complete!")
+	level_completed.emit()
 	return true
+	
+func handle_level_transition():
+	pass

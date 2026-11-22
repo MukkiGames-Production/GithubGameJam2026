@@ -1,5 +1,5 @@
-[gd_scene load_steps=2 format=3 uid="uid://ome8hxlo5c6o"]
+[gd_scene format=3 uid="uid://ome8hxlo5c6o"]
 
-[ext_resource type="PackedScene" path="res://Gate/gate.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://chvm60s11q1j" path="res://WorldObjects/Gate/gate.tscn" id="1"]
 
-[node name="gate" instance=ExtResource("1")]
+[node name="gate" unique_id=349681147 instance=ExtResource("1")]

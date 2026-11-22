@@ -6,10 +6,12 @@ var inputs := {
 	&"ui_up":    Vector2i.UP,
 	&"ui_down":  Vector2i.DOWN,
 }
-
 var desired_dir: Vector2i = Vector2i.ZERO
+var movement_active = true
 
 func _unhandled_input(event: InputEvent) -> void:
+	if !movement_active:
+		return
 	for action in inputs:
 		if event.is_action_pressed(action):
 			desired_dir = inputs[action]
@@ -41,4 +43,6 @@ func try_move(dir: Vector2i) -> bool:
 	return success
 
 func _on_move_finished() -> void:
-	level.check_win()
+	if level.check_win(self.grid_pos):
+		movement_active = false
+		desired_dir = Vector2i.ZERO
