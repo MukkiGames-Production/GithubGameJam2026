@@ -140,22 +140,21 @@ func extend(dir: Vector2i, new_val: String = "-1", new_op: String = "NONE") -> B
 
 	return new_segment
 
-func evaluate(inputs: Array[String]) -> Array[String]:
-	# Simple version – uses the first segment.
-	# Later you can make this cell-aware.
-	if segments.is_empty():
-		return inputs.duplicate()
+func evaluate(inputs: Array[String], segment: BoxSegment = null) -> Array[String]:
+	if segment == null:
+		if segments.is_empty():
+			return inputs.duplicate()
+		segment = segments[0]
 
-	var s = segments[0]
 	var output: Array[String] = []
 
-	if s.val != "-1":
-		if Operators.is_binary(s.val):
-			output.append(s.val)
+	if segment.val != "-1":
+		if Operators.is_binary(segment.val):
+			output.append(segment.val)
 		return output
 
-	if s.op != "NONE":
-		var result := Operators.evaluate(s.op, inputs)
+	if segment.op != "NONE":
+		var result := Operators.evaluate(segment.op, inputs)
 		if not result.is_empty():
 			output.append(result)
 		return output

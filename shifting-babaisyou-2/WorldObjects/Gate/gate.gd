@@ -7,11 +7,8 @@ var _state_reported := false
 func _ready() -> void:
 	change_gate_state(is_open)
 
-
 func incoming_signal(truth: bool):
 	change_gate_state(truth)
-
-
 
 func change_gate_state(truth: bool):
 	if _state_reported and is_open == truth:

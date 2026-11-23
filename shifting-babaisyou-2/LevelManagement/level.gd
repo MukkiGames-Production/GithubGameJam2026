@@ -76,13 +76,15 @@ func recalculate_signals() -> void:
 			complete = complete and not results[source].is_empty()
 		tile.incoming_values = inputs
 		var output: Array[String] = []
-		var box := get_box_at(tile.grid_pos) as Box
-		if box != null and box.val != "-1":
-			output = box.evaluate(inputs)
+		var box: Box = boxes.get(tile.grid_pos)
+		var segment := get_segment_at(tile.grid_pos)
+		if segment != null and segment.val != "-1":
+			output = box.evaluate(inputs, segment)
 		elif complete:
-			output = box.evaluate(inputs) if box != null else inputs.duplicate()
+			output = box.evaluate(inputs, segment) if box != null else inputs.duplicate()
 		if box != null and output.is_empty() and complete:
 			tile.error = "Invalid value, operator, or number of inputs."
+
 		results[tile] = output
 		var sent: Array[SignalTile] = []
 		for destination in tile.destinations:
@@ -108,10 +110,23 @@ func recalculate_signals() -> void:
 func get_box_at(cell: Vector2i) -> Box:
 	return boxes.get(cell)
 
+func get_segment_at(cell: Vector2i) -> BoxSegment:
+	var box := get_box_at(cell)
+	if box == null:
+		return null
+	for segment in box.segments:
+		if box.grid_pos + segment.offset == cell:
+			return segment
+	return null
+
+
 func is_wall(cell: Vector2i) -> bool:
 	return walls_layer.get_cell_source_id(cell) != -1
 
 func check_win(player_grid_pos):
+	if goal == null:
+		push_warning("no goal in scene!!!!")
+		return
 	if player_grid_pos != goal.grid_pos:
 		return false
 	

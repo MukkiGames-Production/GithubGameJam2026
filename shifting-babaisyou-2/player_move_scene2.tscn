@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dvunsvy35sb5b" path="res://MovingEntities/Box/Box.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://bi1r8yy4tsvq6" path="res://MovingEntities/Player/player.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://SignalTile.tscn" id="4"]
-[ext_resource type="PackedScene" uid="uid://chvm60s11q1j" path="res://WorldObjects/Gate/gate.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://chvm60s11q1j" path="res://WorldObjects/Gate/Gate.tscn" id="5"]
 
 [sub_resource type="TileSet" id="Grid"]
 
@@ -46,9 +46,7 @@ destinations = [NodePath("../OutputTile")]
 position = Vector2(208, 112)
 receivers = [NodePath("../Gate")]
 
-[node name="Gate" parent="Level" unique_id=618116183 instance=ExtResource("5")]
-position = Vector2(272, 112)
-script = null
+[node name="Gate" parent="Level" unique_id=1396264574 instance=ExtResource("5")]
 
 [node name="Boxes" type="Node2D" parent="Level" unique_id=767144626]
 
@@ -56,6 +54,15 @@ script = null
 position = Vector2(80, 112)
 tile_size = 32
 
+[node name="BoxSegment" parent="Level/Boxes/Box1" index="0" unique_id=1918891361]
+val = "1"
+
 [node name="Box0" parent="Level/Boxes" unique_id=436411573 instance=ExtResource("2")]
 position = Vector2(144, 112)
 tile_size = 32
+
+[node name="BoxSegment" parent="Level/Boxes/Box0" index="0" unique_id=1918891361]
+val = "1"
+
+[editable path="Level/Boxes/Box1"]
+[editable path="Level/Boxes/Box0"]
